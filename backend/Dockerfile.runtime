@@ -1,0 +1,56 @@
+# On-prem runtime image: same as Dockerfile + a `llama-server` binary baked in.
+# Self-contained (no FROM local-llm-backend) so docker-compose can build it directly.
+FROM python:3.12-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    UV_LINK_MODE=copy \
+    UV_SYSTEM_PYTHON=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        curl \
+        ca-certificates \
+        unzip \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir uv
+
+# --- llama-server binary ---
+# Default flavor is ubuntu-x64. On Apple Silicon, run the container with
+# `platform: linux/amd64` so this runs under Rosetta.
+ARG LLAMA_CPP_VERSION=b4358
+ARG LLAMA_CPP_FLAVOR=ubuntu-x64
+RUN curl -fSL -o /tmp/llama.zip \
+      "https://github.com/ggerganov/llama.cpp/releases/download/${LLAMA_CPP_VERSION}/llama-${LLAMA_CPP_VERSION}-bin-${LLAMA_CPP_FLAVOR}.zip" \
+    && unzip /tmp/llama.zip -d /tmp/llama \
+    && find /tmp/llama -type f -name 'llama-server' -exec cp {} /usr/local/bin/ \; \
+    && find /tmp/llama -type f \( -name 'lib*.so' -o -name 'lib*.so.*' \) -exec cp {} /usr/local/lib/ \; \
+    && chmod +x /usr/local/bin/llama-server \
+    && ldconfig \
+    && rm -rf /tmp/llama /tmp/llama.zip \
+    && /usr/local/bin/llama-server --version 2>&1 | head -2 || true
+
+# --- Python deps + project ---
+WORKDIR /app
+
+COPY pyproject.toml ./
+RUN uv pip compile pyproject.toml -o /tmp/requirements.txt --quiet
+RUN uv pip install --system --no-cache -r /tmp/requirements.txt
+
+COPY . .
+
+RUN useradd --uid 10001 --create-home --shell /usr/sbin/nologin app \
+    && mkdir -p /app/data \
+    && chown -R app:app /app
+USER app
+
+ENV PORT=8000 \
+    LLAMA_SERVER_BINARY=/usr/local/bin/llama-server \
+    DJANGO_SETTINGS_MODULE=config.settings.development
+EXPOSE 8000
+
+CMD ["sh", "-c", "uvicorn config.asgi:application --host 0.0.0.0 --port ${PORT}"]

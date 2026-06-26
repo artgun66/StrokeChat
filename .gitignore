@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+.env
+.env.local
+.env.*.local
+.python-version-local
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Node
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+.pnpm-store/
+
+# Editors / per-developer tooling
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+.DS_Store
+
+# Project data dirs (model files, downloads, runtime state).
+# Anchored with leading `/` so this only matches the top-level data dirs and
+# does NOT swallow legitimate `data/` subdirectories like
+# backend/apps/catalog/data/ (catalog seed YAMLs).
+/data/
+/backend/data/
+
+# Secrets
+*.pem
+*.key
+secrets/
+
+# Build artifacts
+*.log
+
+# Large model files / local-only data
+/artun_model/BiomedParse/
+/artun_model/move_to_linux/
+/artun_model/outputs/

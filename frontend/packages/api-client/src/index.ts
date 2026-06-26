@@ -1,0 +1,10 @@
+export { ApiClient } from "./client";
+export type { ApiClientOptions } from "./client";
+export { catalogApi } from "./catalog";
+export type { CatalogModel } from "./catalog";
+export { downloadsApi } from "./downloads";
+export type { DownloadJob } from "./downloads";
+export { modelsApi } from "./models_registry";
+export type { ModelFile } from "./models_registry";
+export { threadsApi, streamChatCompletions } from "./threads";
+export type { Thread, ThreadMessage, ChatChunk } from "./threads";

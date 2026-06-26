@@ -1,0 +1,20 @@
+{
+  "name": "local-llm-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.6.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

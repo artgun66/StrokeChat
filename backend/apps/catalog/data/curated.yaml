@@ -1,0 +1,218 @@
+# Curated catalog — refreshed 2026-04-26.
+#
+# Tier-organized: tiny → small → medium → coding → large. All entries are
+# commercial-use-OK. Older models have been moved out; `seed_catalog` will mark
+# any catalog row not in this file as deprecated, but it preserves the row so
+# prior downloads keep resolving.
+#
+# Integrity fields (source_revision, sha256, size_bytes) are pinned to real values
+# resolved from the Hugging Face API by `python manage.py refresh_catalog_hashes`.
+# A few license_text_sha256 fields may still be PLACEHOLDER_LICENSE_SHA when the
+# model org's LICENSE file isn't directly fetchable — that's informational and
+# doesn't block downloads.
+
+# ===== Tiny — laptop CPU / edge =====
+
+- slug: smollm3-3b-q4
+  display_name: SmolLM3 3B Instruct (Q4_K_M)
+  family: smollm3
+  tier: tiny
+  source_url: https://huggingface.co/bartowski/HuggingFaceTB_SmolLM3-3B-GGUF/resolve/main/HuggingFaceTB_SmolLM3-3B-Q4_K_M.gguf
+  source_repo: bartowski/HuggingFaceTB_SmolLM3-3B-GGUF
+  source_revision: 86b3536ed1ca0dcb4716745642db4e6804bf3d32
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 519732558d5fa7420ab058e1b776dcfe73da78013c2fe59c7ca43c325ef89132
+  size_bytes: 1915305792
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+
+- slug: gemma-4-e2b-it-q4
+  display_name: Gemma 4 E2B Instruct (Q4_K_M, vision)
+  family: gemma-4
+  tier: tiny
+  source_url: https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_K_M.gguf
+  source_repo: unsloth/gemma-4-E2B-it-GGUF
+  source_revision: ecc8b33b2c50598815e4b0f7cea6088e3ae7adb8
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 9378bc471710229ef165709b62e34bfb62231420ddaf6d729e727305b5b8672d
+  size_bytes: 3106736256
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/google/gemma-4-e2b-it/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+  mmproj_url: https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/mmproj-F16.gguf
+  mmproj_sha256: 140be8d7849741f88c50757d529b84373ee8e27052cc2236855b537f4a8215fa
+  mmproj_size_bytes: 985654080
+  vision_enabled: true
+
+- slug: qwen3.5-2b-instruct-q4
+  display_name: Qwen 3.5 2B Instruct (Q4_K_M)
+  family: qwen3.5
+  tier: tiny
+  source_url: https://huggingface.co/bartowski/Qwen_Qwen3.5-2B-GGUF/resolve/main/Qwen_Qwen3.5-2B-Q4_K_M.gguf
+  source_repo: bartowski/Qwen_Qwen3.5-2B-GGUF
+  source_revision: 7d26695454df6de5fbcce2e58681e62dae06ce43
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 57a1085840f497d764a7fc5d346922dbde961efb54cc792ea81d694fd846a1d8
+  size_bytes: 1396198496
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/Qwen/Qwen3.5-2B/blob/main/LICENSE
+  license_text_sha256: bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a
+  allowed_use: commercial
+
+# ===== Small — consumer GPU / Apple Silicon =====
+
+- slug: gemma-4-e4b-it-q4
+  display_name: Gemma 4 E4B Instruct (Q4_K_M, vision)
+  family: gemma-4
+  tier: small
+  source_url: https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf
+  source_repo: unsloth/gemma-4-E4B-it-GGUF
+  source_revision: e1d90e5fb9f61d8dc71ef016580784a054e5c787
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 519b9793ed6ce0ff530f1b7c96e848e08e49e7af4d57bb97f76215963a54146d
+  size_bytes: 4977169568
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/google/gemma-4-e4b-it/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+  mmproj_url: https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/mmproj-F16.gguf
+  mmproj_sha256: ddf46c21d7078e95338cfc22306b19b276a29a5ad089023449dd54d4b6170a51
+  mmproj_size_bytes: 990372672
+  vision_enabled: true
+
+- slug: qwen3.5-9b-instruct-q4
+  display_name: Qwen 3.5 9B Instruct (Q4_K_M)
+  family: qwen3.5
+  tier: small
+  source_url: https://huggingface.co/bartowski/Qwen_Qwen3.5-9B-GGUF/resolve/main/Qwen_Qwen3.5-9B-Q4_K_M.gguf
+  source_repo: bartowski/Qwen_Qwen3.5-9B-GGUF
+  source_revision: 182be2fd6c7bc44887d88a91cb03ff009cc9f549
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: d784ce9eda1a5a7b51e8f705a9e6310844bf4f173654d115823c775fdea56d43
+  size_bytes: 6169341984
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/Qwen/Qwen3.5-9B/blob/main/LICENSE
+  license_text_sha256: bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a
+  allowed_use: commercial
+
+- slug: jan-nano-q4
+  display_name: Jan-Nano 4B Research / MCP (Q4_K_M)
+  family: jan-nano
+  tier: small
+  source_url: https://huggingface.co/unsloth/Jan-nano-GGUF/resolve/main/Jan-nano-Q4_K_M.gguf
+  source_repo: unsloth/Jan-nano-GGUF
+  source_revision: 58c721d228389c5256c8c18d562153fb177b8789
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 5dcd9c20e8d5b2ae444e2cf747bd2ad968970095e017515927b4377159f0449d
+  size_bytes: 2497280896
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/Menlo/Jan-nano/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+
+# ===== Medium — workstation GPU / Apple Silicon Pro =====
+
+- slug: mistral-small-3.2-24b-instruct-q4
+  display_name: Mistral Small 3.2 24B Instruct (2506, Q4_K_M, vision)
+  family: mistral-small-3
+  tier: medium
+  source_url: https://huggingface.co/bartowski/mistralai_Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/mistralai_Mistral-Small-3.2-24B-Instruct-2506-Q4_K_M.gguf
+  source_repo: bartowski/mistralai_Mistral-Small-3.2-24B-Instruct-2506-GGUF
+  source_revision: b3592d09be469bedab6be51f577824b3b6b76ba1
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 80f5bda68f156f12650ca03a0a2dbfae06a215ac41caa773b8631a479f82415e
+  size_bytes: 14333915264
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/mistralai/Mistral-Small-3.2-24B-Instruct-2506/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+  mmproj_url: https://huggingface.co/bartowski/mistralai_Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/mmproj-mistralai_Mistral-Small-3.2-24B-Instruct-2506-f16.gguf
+  mmproj_sha256: e41cc0321dbd0d7e42cdada75862a5ed0b221263313b0f1b55b0b696dfec8647
+  mmproj_size_bytes: 878054144
+  vision_enabled: true
+
+- slug: qwen3.5-27b-instruct-q4
+  display_name: Qwen 3.5 27B Instruct (Q4_K_M)
+  family: qwen3.5
+  tier: medium
+  source_url: https://huggingface.co/bartowski/Qwen_Qwen3.5-27B-GGUF/resolve/main/Qwen_Qwen3.5-27B-Q4_K_M.gguf
+  source_repo: bartowski/Qwen_Qwen3.5-27B-GGUF
+  source_revision: d7b113c40283f4d99f4eb0ec20d126ad653cc736
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 81657841d62f1821c748d0fea6c260b7d3508844fe4e9250253ef81c4e4d9edf
+  size_bytes: 17984872928
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/Qwen/Qwen3.5-27B/blob/main/LICENSE
+  license_text_sha256: 50cbab8a892c5f2993b8c7351a99182507472def3b1374558308605d99b86b32
+  allowed_use: commercial
+
+- slug: gemma-4-31b-it-q4
+  display_name: Gemma 4 31B Instruct Dense (Q4_K_M, vision)
+  family: gemma-4
+  tier: medium
+  source_url: https://huggingface.co/bartowski/google_gemma-4-31B-it-GGUF/resolve/main/google_gemma-4-31B-it-Q4_K_M.gguf
+  source_repo: bartowski/google_gemma-4-31B-it-GGUF
+  source_revision: cc32b3c97b908fda3cfe90b60a5faf9f059c69a0
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 35dacd53f9dde83fe20a4596efce2b2f72d2ebb6e4141186533419e9e98bc269
+  size_bytes: 19598488192
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/google/gemma-4-31b-it/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+  mmproj_url: https://huggingface.co/bartowski/google_gemma-4-31B-it-GGUF/resolve/main/mmproj-google_gemma-4-31B-it-f16.gguf
+  mmproj_sha256: 3e3f3f593b34bb4f518ada3e7999e4cbcd2a5864fa86ebc23fad3cbc4fbeba40
+  mmproj_size_bytes: 1198956736
+  vision_enabled: true
+
+# Qwen 3.6 35B-A3B GGUF: removed pending a verifiable upload path on HF.
+
+# ===== Coding specialist =====
+
+- slug: qwen3-coder-30b-a3b-q4
+  display_name: Qwen 3 Coder 30B-A3B Instruct (MoE, Q4_K_M)
+  family: qwen3-coder
+  tier: coding
+  source_url: https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
+  source_repo: unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
+  source_revision: b17cb02dd882d5b6ab62fc777ad2995f19668350
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad
+  size_bytes: 18556689568
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/blob/main/LICENSE
+  license_text_sha256: 832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e
+  allowed_use: commercial
+
+# ===== Large — server / multi-GPU =====
+
+- slug: llama-3.3-70b-instruct-q4
+  display_name: Llama 3.3 70B Instruct (Q4_K_M)
+  family: llama-3.3
+  tier: large
+  source_url: https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct-Q4_K_M.gguf
+  source_repo: bartowski/Llama-3.3-70B-Instruct-GGUF
+  source_revision: b6c5c9f176f3279204034e1d16d393105e95cb88
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: 32df3baccb556f9840059b2528b2dee4d3d516b24afdfb9d0c56ff5f63e3a664
+  size_bytes: 42520398816
+  license_spdx: llama-3.3
+  license_url: https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+
+# Llama 4 Scout 17B-16E GGUF: removed pending a verifiable upload path on HF.

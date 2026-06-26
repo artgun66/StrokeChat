@@ -1,0 +1,31 @@
+{
+  "name": "product",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@local-llm/api-client": "workspace:*",
+    "@local-llm/auth": "workspace:*",
+    "@local-llm/ui": "workspace:*",
+    "next": "15.2.0",
+    "pdfjs-dist": "^4.10.38",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@local-llm/config": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "postcss": "^8.4.49",
+    "typescript": "^5.7.2"
+  }
+}
