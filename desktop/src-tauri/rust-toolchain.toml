@@ -1,0 +1,5 @@
+# Tauri 2's dependency tree currently requires rustc >= 1.88. On a rustup-managed machine
+# this auto-installs a current stable toolchain. Homebrew users on an older rustc should
+# `brew upgrade rust` (or install rustup) before building.
+[toolchain]
+channel = "stable"

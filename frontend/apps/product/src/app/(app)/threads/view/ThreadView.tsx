@@ -1,9 +1,9 @@
 "use client";
 
 import type { ThreadMessage } from "@local-llm/api-client";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { api } from "../../../../lib/api";
+import { notifyThreadsChanged } from "../../../../lib/use-threads";
 import { ChatPane } from "../../../../components/ChatPane";
 
 export type AvailableModel = {
@@ -20,8 +20,8 @@ type Props = {
 };
 
 // LLM-derived titles take ~2-5s to land after the response finishes streaming. We
-// nudge router.refresh() at two horizons so the sidebar picks up the refined title
-// even if the model is slow.
+// nudge the sidebar to refetch at two horizons so it picks up the refined title even
+// if the model is slow.
 const TITLE_REFRESH_FIRST_MS = 5000;
 const TITLE_REFRESH_FOLLOWUP_MS = 12000;
 
@@ -32,7 +32,6 @@ export function ThreadView({
   availableModels,
   initialMessages,
 }: Props) {
-  const router = useRouter();
   const [modelSlug, setModelSlug] = useState(initialModelSlug);
   const [systemPrompt, setSystemPrompt] = useState(initialSystemPrompt);
   const refreshTimers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
@@ -59,8 +58,8 @@ export function ThreadView({
   function onMessageComplete() {
     refreshTimers.current.forEach(clearTimeout);
     refreshTimers.current = [
-      setTimeout(() => router.refresh(), TITLE_REFRESH_FIRST_MS),
-      setTimeout(() => router.refresh(), TITLE_REFRESH_FOLLOWUP_MS),
+      setTimeout(() => notifyThreadsChanged(), TITLE_REFRESH_FIRST_MS),
+      setTimeout(() => notifyThreadsChanged(), TITLE_REFRESH_FOLLOWUP_MS),
     ];
   }
 

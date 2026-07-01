@@ -1,0 +1,8 @@
+# Models bundled into the desktop app and registered as READY on first launch, so chat
+# works fully offline without hitting Hugging Face. The referenced files are staged into
+# this directory by scripts/stage-resources.sh (Phase 3) — they are NOT committed to git
+# (multi-GB). Each slug MUST match a row in backend/apps/catalog/data/curated.yaml.
+models:
+  - slug: gemma-4-e2b-it-q4
+    file: gemma-4-E2B-it-Q4_K_M.gguf
+    mmproj: mmproj-F16.gguf
