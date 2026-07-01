@@ -2,7 +2,7 @@
 
 import type { ThreadMessage } from "@local-llm/api-client";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import type { AvailableModel } from "../app/(app)/threads/[id]/ThreadView";
+import type { AvailableModel } from "../app/(app)/threads/view/ThreadView";
 import { api, apiBaseUrl } from "../lib/api";
 import { CustomInstructions } from "./CustomInstructions";
 import { MessageInput, type ImageAttachment, type MessageInputHandle } from "./MessageInput";
@@ -155,7 +155,7 @@ export function ChatPane({
       ? biomedResults.map((r) => {
           const targetLabel = r.target === "bleeding" ? "intracranial hemorrhage" : "ischemic stroke";
           const verdict = r.detected ? "DETECTED" : "NOT DETECTED";
-          return `[BiomedParse CT Scan Analysis]\nDetection target: ${targetLabel}\nResult: ${verdict}\nModel confidence: ${(r.confidence * 100).toFixed(1)}%`;
+          return `[BiomedParse CT Scan Analysis]\nDetection target: ${targetLabel}\nResult: ${verdict}`;
         }).join("\n\n") + "\n\n"
       : "";
 
@@ -172,7 +172,7 @@ export function ChatPane({
         }
         const ctx = m.biomedResults.map((r) => {
           const label = r.target === "bleeding" ? "intracranial hemorrhage" : "ischemic stroke";
-          return `[BiomedParse CT Scan Analysis]\nTarget: ${label}\nResult: ${r.detected ? "DETECTED" : "NOT DETECTED"}\nConfidence: ${(r.confidence * 100).toFixed(1)}%`;
+          return `[BiomedParse CT Scan Analysis]\nTarget: ${label}\nResult: ${r.detected ? "DETECTED" : "NOT DETECTED"}`;
         }).join("\n\n");
         const userText = m.content === "(CT scan submitted for analysis)" ? "Analyse these findings." : m.content;
         return { role: m.role, content: ctx + "\n\n" + userText };
@@ -350,16 +350,6 @@ export function ChatPane({
                                 ? `${r.target === "bleeding" ? "Hemorrhage" : "Ischemic stroke"} detected`
                                 : `No ${r.target === "bleeding" ? "hemorrhage" : "ischemic stroke"} detected`}
                             </p>
-                            <span className={`ml-auto text-xs font-medium ${r.detected ? "text-red-300" : "text-green-300"}`}>
-                              {(r.confidence * 100).toFixed(1)}%
-                            </span>
-                          </div>
-                          {/* Confidence bar */}
-                          <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                            <div
-                              className={`h-full rounded-full ${r.detected ? "bg-red-400" : "bg-green-400"}`}
-                              style={{ width: `${(r.confidence * 100).toFixed(0)}%` }}
-                            />
                           </div>
                           {/* Images */}
                           <div className="grid grid-cols-2 gap-2">

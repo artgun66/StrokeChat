@@ -4,3 +4,7 @@ from django.apps import AppConfig
 class CoreConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.core"
+
+    def ready(self) -> None:
+        # Register the SQLite connection tuning receiver (no-op on Postgres).
+        from . import db  # noqa: F401

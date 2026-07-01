@@ -1,5 +1,8 @@
+"use client";
+
 import type { ModelFile } from "@local-llm/api-client";
-import { serverApi } from "../../../lib/server-api";
+import { useEffect, useState } from "react";
+import { api } from "../../../lib/api";
 
 function formatBytes(n: number): string {
   if (n < 1024) return `${n} B`;
@@ -37,10 +40,25 @@ function statusClass(status: ModelFile["status"]): string {
   }
 }
 
-export default async function ModelsPage() {
-  const { models } = serverApi();
-  const data = await models.list();
-  const items = [...data.results].sort(
+export default function ModelsPage() {
+  const [files, setFiles] = useState<ModelFile[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.models
+      .list()
+      .then((data) => {
+        if (!cancelled) setFiles(data.results);
+      })
+      .catch(() => {
+        /* leave empty on failure */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const items = [...files].sort(
     (a, b) =>
       new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
   );

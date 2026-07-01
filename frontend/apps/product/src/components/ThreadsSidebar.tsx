@@ -5,14 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "../lib/api";
+import { useThreads } from "../lib/use-threads";
 
 type Props = {
-  threads: Thread[];
   activeId?: string;
 };
 
-export function ThreadsSidebar({ threads, activeId }: Props) {
+export function ThreadsSidebar({ activeId }: Props) {
   const router = useRouter();
+  const { threads, refetch } = useThreads();
   const [busy, setBusy] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -20,7 +21,7 @@ export function ThreadsSidebar({ threads, activeId }: Props) {
     setBusy(true);
     try {
       const t = await api.threads.create({ title: "New thread" });
-      window.location.href = `/threads/${t.id}`;
+      window.location.href = `/threads/view?id=${t.id}`;
     } finally {
       setBusy(false);
     }
@@ -43,7 +44,7 @@ export function ThreadsSidebar({ threads, activeId }: Props) {
         router.push("/threads");
       } else {
         // Stay where we are, just refresh the sidebar list.
-        router.refresh();
+        refetch();
       }
     } catch (e) {
       window.alert(
@@ -78,7 +79,7 @@ export function ThreadsSidebar({ threads, activeId }: Props) {
             return (
               <li key={t.id} className="group relative">
                 <Link
-                  href={`/threads/${t.id}`}
+                  href={`/threads/view?id=${t.id}`}
                   aria-current={isActive ? "page" : undefined}
                   className={
                     "block truncate rounded-lg border py-2 pl-3 pr-9 transition " +

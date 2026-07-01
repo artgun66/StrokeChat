@@ -54,3 +54,20 @@ secrets/
 /artun_model/BiomedParse/
 /artun_model/move_to_linux/
 /artun_model/outputs/
+
+# Desktop app (Tauri)
+/desktop/node_modules/
+/desktop/dist/
+# Keep the staged/ dir (Tauri validates the resource path at compile time) but ignore its
+# heavy generated contents.
+/desktop/staged/*
+!/desktop/staged/.gitkeep
+/desktop/src-tauri/target/
+/desktop/src-tauri/gen/
+# Bundled weights are fetched at stage time, never committed (multi-GB).
+/desktop/resources/models/*.gguf
+/desktop/resources/models/*.ckpt
+# Re-include desktop/build/ (the global `build/` rule above would swallow the
+# electron-builder resources we DO need tracked, e.g. entitlements).
+!/desktop/build/
+!/desktop/build/**

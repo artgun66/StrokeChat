@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "root": "frontend/apps/product",
+  "buildCommand": "cd ../../.. && pnpm --filter product build",
+  "outputDirectory": "frontend/apps/product/.next",
+  "installCommand": "pnpm install",
+  "env": {
+    "NEXT_PUBLIC_API_URL": ""
+  }
+}

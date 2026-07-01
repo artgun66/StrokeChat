@@ -20,7 +20,7 @@ export function NewThreadButton({ className, children }: Props) {
     setBusy(true);
     try {
       const t = await api.threads.create({ title: "New thread" });
-      window.location.href = `/threads/${t.id}`;
+      window.location.href = `/threads/view?id=${t.id}`;
     } catch (e) {
       window.alert(
         `Couldn't create thread: ${e instanceof Error ? e.message : "unknown error"}`,

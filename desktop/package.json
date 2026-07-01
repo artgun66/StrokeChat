@@ -1,0 +1,14 @@
+{
+  "name": "local-llm-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zero-install desktop shell for Local LLM — Tauri 2 + a Rust supervisor that orchestrates the bundled Django/BiomedParse/llama-server/Next sidecars.",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

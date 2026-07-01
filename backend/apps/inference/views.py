@@ -49,15 +49,19 @@ async def chat_completions(request: HttpRequest) -> StreamingHttpResponse | Json
 
     thread_id = payload.get("thread_id")  # our extension (optional)
 
-    @sync_to_async
-    def _check_ready() -> bool:
-        return ModelFile.objects.filter(catalog_slug=model, status=ModelStatus.READY).exists()
+    import os as _os
+    _use_modal = bool(_os.environ.get("MODAL_TOKEN_ID"))
 
-    if not await _check_ready():
-        return JsonResponse(
-            {"error": f"model {model!r} is not downloaded on this runtime", "code": "model_not_ready"},
-            status=404,
-        )
+    if not _use_modal:
+        @sync_to_async
+        def _check_ready() -> bool:
+            return ModelFile.objects.filter(catalog_slug=model, status=ModelStatus.READY).exists()
+
+        if not await _check_ready():
+            return JsonResponse(
+                {"error": f"model {model!r} is not downloaded on this runtime", "code": "model_not_ready"},
+                status=404,
+            )
 
     # Custom instructions: if this thread has a system_prompt set and the client
     # didn't already include a system message, prepend ours. Clients that already

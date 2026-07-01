@@ -56,11 +56,20 @@ export type ChatChunk = {
  * Stream chat completions over SSE. Yields each parsed chunk JSON object until [DONE].
  * Errors are pushed as `{error: string}` chunks.
  */
+/** Message content is either plain text or OpenAI-style multimodal parts (text +
+ *  image_url), which the backend's chat-completions endpoint accepts for vision models. */
+export type ChatMessageContent =
+  | string
+  | Array<
+      | { type: "text"; text: string }
+      | { type: "image_url"; image_url: { url: string } }
+    >;
+
 export async function* streamChatCompletions(
   baseUrl: string,
   body: {
     model: string;
-    messages: Array<{ role: string; content: string }>;
+    messages: Array<{ role: string; content: ChatMessageContent }>;
     thread_id?: string;
     [k: string]: unknown;
   },

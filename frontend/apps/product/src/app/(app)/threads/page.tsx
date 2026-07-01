@@ -1,13 +1,12 @@
-import { serverApi } from "../../../lib/server-api";
+"use client";
+
 import { NewThreadButton } from "../../../components/NewThreadButton";
 import { ThreadsSidebar } from "../../../components/ThreadsSidebar";
 
-export default async function ThreadsIndex() {
-  const { threads } = serverApi();
-  const list = await threads.list();
+export default function ThreadsIndex() {
   return (
     <div className="flex h-full">
-      <ThreadsSidebar threads={list.results} />
+      <ThreadsSidebar />
       <main className="flex flex-1 items-center justify-center p-6 md:p-10">
         <div className="max-w-sm rounded-2xl border border-[var(--border)]/90 bg-gradient-to-b from-[var(--panel-elevated)]/90 to-[var(--panel)] p-8 text-center shadow-lg shadow-black/15">
           <p className="text-sm font-medium text-[var(--text)]">Pick a thread or start fresh</p>

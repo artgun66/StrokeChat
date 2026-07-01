@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: llm-app-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: |
+      pip install -r requirements.txt modal whitenoise &&
+      python manage.py migrate --noinput &&
+      python manage.py seed_catalog --allow-placeholders &&
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --workers 2
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.cloud
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: llm-app-db
+          property: connectionString
+      - key: MODAL_TOKEN_ID
+        sync: false
+      - key: MODAL_TOKEN_SECRET
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "*"
+    healthCheckPath: /healthz
+
+databases:
+  - name: llm-app-db
+    plan: free

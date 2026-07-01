@@ -1,7 +1,10 @@
+"use client";
+
 import type { CatalogModel } from "@local-llm/api-client";
 
 type ModelTier = CatalogModel["tier"];
-import { serverApi } from "../../../lib/server-api";
+import { useEffect, useState } from "react";
+import { api } from "../../../lib/api";
 import { DownloadButton } from "../../../components/DownloadButton";
 
 function formatBytes(n: number): string {
@@ -39,16 +42,34 @@ function tierIndex(t: ModelTier): number {
   return i < 0 ? 999 : i;
 }
 
-export default async function HubPage() {
-  const { catalog, models } = serverApi();
-  const [data, modelsData] = await Promise.all([catalog.list(), models.list()]);
-  const readySlugs = new Set(
-    modelsData.results
-      .filter((m) => m.status === "ready")
-      .map((m) => m.catalog_slug),
-  );
+export default function HubPage() {
+  const [catalogModels, setCatalogModels] = useState<CatalogModel[]>([]);
+  const [readySlugs, setReadySlugs] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
 
-  const sorted: CatalogModel[] = [...data.results].sort((a, b) => {
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([api.catalog.list(), api.models.list()])
+      .then(([data, modelsData]) => {
+        if (cancelled) return;
+        setCatalogModels(data.results);
+        setReadySlugs(
+          new Set(
+            modelsData.results
+              .filter((m) => m.status === "ready")
+              .map((m) => m.catalog_slug),
+          ),
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sorted: CatalogModel[] = [...catalogModels].sort((a, b) => {
     const d = tierIndex(a.tier) - tierIndex(b.tier);
     if (d !== 0) return d;
     return a.display_name.localeCompare(b.display_name, "en", {
@@ -65,7 +86,9 @@ export default async function HubPage() {
         <p className="mt-1 text-xs leading-snug text-[var(--muted)]">
           Signed manifests, checksum-verified downloads.{" "}
           <span className="text-[var(--text)]/80">
-            {sorted.length} model{sorted.length === 1 ? "" : "s"} available.
+            {loading
+              ? "Loading…"
+              : `${sorted.length} model${sorted.length === 1 ? "" : "s"} available.`}
           </span>
         </p>
       </div>

@@ -1,0 +1,80 @@
+# Phase 5 — per-OS desktop installer build (Tauri 2). Each runner stages its own platform's
+# Python freezes + llama-server + Node binary (not cross-buildable) and builds an installer.
+# Signing is gated on secrets; without them, unsigned artifacts are produced.
+name: desktop-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_models:
+        description: "Skip the multi-GB model download"
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14       # Apple Silicon
+            osdir: darwin-arm64
+          - os: macos-13       # Intel
+            osdir: darwin-x64
+          - os: windows-latest
+            osdir: win-x64
+          - os: ubuntu-22.04
+            osdir: linux-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: corepack enable
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Linux system deps for Tauri
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Provision llama-server binary
+        shell: bash
+        run: |
+          mkdir -p desktop/staged/bin/${{ matrix.osdir }}
+          # TODO: download the matching llama.cpp release for ${{ matrix.osdir }} into that dir.
+
+      - name: Stage resources (Python freezes, frontend, model, binaries)
+        shell: bash
+        env:
+          SKIP_MODELS: ${{ inputs.skip_models && '1' || '0' }}
+        run: cd desktop && ./scripts/stage-resources.sh
+
+      - name: Build installer (Tauri)
+        shell: bash
+        env:
+          # macOS signing/notarization (empty ⇒ unsigned dev build).
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Windows Authenticode.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.WINDOWS_CERTIFICATE }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: cd desktop && npm install && npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: local-llm-${{ matrix.osdir }}
+          path: |
+            desktop/src-tauri/target/release/bundle/**/*.dmg
+            desktop/src-tauri/target/release/bundle/**/*.exe
+            desktop/src-tauri/target/release/bundle/**/*.AppImage
+            desktop/src-tauri/target/release/bundle/**/*.deb
+          if-no-files-found: ignore
