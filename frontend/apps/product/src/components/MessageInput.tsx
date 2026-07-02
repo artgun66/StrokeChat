@@ -23,7 +23,17 @@ export type ImageAttachment = {
   size: number;
 };
 
-type Attachment = TextAttachment | ImageAttachment;
+/** A NIfTI scan attachment (.nii / .nii.gz). Routed to the vessel segmentation
+ *  service instead of the vision model. The raw File is kept so it can be POSTed
+ *  as multipart/form-data. */
+export type NiftiAttachment = {
+  kind: "nifti";
+  name: string;
+  file: File;
+  size: number;
+};
+
+type Attachment = TextAttachment | ImageAttachment | NiftiAttachment;
 
 type Props = {
   disabled: boolean;
@@ -32,7 +42,7 @@ type Props = {
    *  behavior — when false, dropping an image surfaces a "switch to a vision
    *  model" hint instead of attaching. */
   allowImages: boolean;
-  onSend: (text: string, images: ImageAttachment[]) => void;
+  onSend: (text: string, images: ImageAttachment[], niftis: NiftiAttachment[]) => void;
 };
 
 export type MessageInputHandle = {
@@ -50,7 +60,8 @@ const ACCEPT =
   ".pdf,.txt,.md,.csv,.json,.yaml,.yml,.toml,.xml,.log,.html,.css,.scss," +
   ".js,.jsx,.ts,.tsx,.py,.go,.rs,.rb,.java,.c,.cpp,.h,.hpp,.cs,.kt,.swift," +
   ".sh,.bash,.zsh,.sql,.env,.ini,.conf,.dockerfile,.makefile," +
-  ".png,.jpg,.jpeg,.webp,.gif";
+  ".png,.jpg,.jpeg,.webp,.gif," +
+  ".nii,.nii.gz";
 
 function formatBytes(n: number): string {
   if (n < 1000) return `${n} B`;
@@ -62,6 +73,7 @@ type FileCategory =
   | "text"
   | "pdf"
   | "image"
+  | "nifti"
   | "office"
   | "archive"
   | "media"
@@ -83,6 +95,7 @@ function categorize(f: File): FileCategory {
   const ext = lower.includes(".") ? lower.slice(lower.lastIndexOf(".") + 1) : "";
   const mime = (f.type || "").toLowerCase();
 
+  if (lower.endsWith(".nii.gz") || ext === "nii") return "nifti";
   if (mime === "application/pdf" || ext === "pdf") return "pdf";
   if (mime.startsWith("image/")) return "image";
   if (mime.startsWith("audio/") || mime.startsWith("video/")) return "media";
@@ -233,6 +246,12 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
 
       const cat = categorize(f);
 
+      // NIfTI scan: always accepted, routed to vessel segmentation.
+      if (cat === "nifti") {
+        accepted.push({ kind: "nifti", name: f.name, file: f, size: f.size });
+        continue;
+      }
+
       // Image: only accept if the currently-selected model supports vision.
       if (cat === "image") {
         if (!allowImages) {
@@ -371,6 +390,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
     let finalText = text;
     const textAttachments = attachments.filter((a): a is TextAttachment => a.kind === "text");
     const imageAttachments = attachments.filter((a): a is ImageAttachment => a.kind === "image");
+    const niftiAttachments = attachments.filter((a): a is NiftiAttachment => a.kind === "nifti");
 
     if (textAttachments.length > 0) {
       const blocks = textAttachments
@@ -382,7 +402,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
       finalText = blocks + (text ? `\n\n${text}` : "");
     }
 
-    onSend(finalText, imageAttachments);
+    onSend(finalText, imageAttachments, niftiAttachments);
     setDraft("");
     setAttachments([]);
     setAttachError(null);
@@ -417,6 +437,26 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
                     onClick={() => removeAttachment(i)}
                     className="-mr-0.5 rounded p-0.5 text-[var(--muted)] hover:bg-white/10 hover:text-white"
                     aria-label={`Remove image ${a.name}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ) : a.kind === "nifti" ? (
+                <span
+                  key={`${a.name}-${i}`}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-300"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/>
+                  </svg>
+                  <span className="max-w-[140px] truncate">{a.name}</span>
+                  <span className="text-cyan-500/60">{formatBytes(a.size)}</span>
+                  <span className="rounded bg-cyan-500/20 px-1 text-[9px] uppercase tracking-wide">CTA</span>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(i)}
+                    className="-mr-0.5 rounded p-0.5 text-cyan-500/60 hover:bg-white/10 hover:text-white"
+                    aria-label={`Remove scan ${a.name}`}
                   >
                     ×
                   </button>
@@ -503,7 +543,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
             aria-label="Message"
             placeholder={
               hasModel
-                ? "Ask about stroke, or drop a CT scan image to analyse it…"
+                ? "Ask anything, drop a CT image (BiomedParse) or a .nii.gz CTA scan (vessel segmentation)…"
                 : "Download a model first"
             }
             value={draft}

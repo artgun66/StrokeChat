@@ -50,9 +50,8 @@ export default function RootLayout({
               aria-label="Main"
             >
               <NavLink href="/threads">Chat</NavLink>
-              <NavLink href="/hub">Model hub</NavLink>
-              <NavLink href="/models">Installed</NavLink>
               <NavLink href="/biomedparse">BiomedParse</NavLink>
+              <NavLink href="/vessel-segmentation">Vessels</NavLink>
             </nav>
             <div
               className="hidden text-right text-[11px] text-[var(--muted)] md:block"
