@@ -1,4 +1,4 @@
-"""Gemma 3 27B-IT inference on Modal A10G.
+"""Gemma 3 27B-IT inference on Modal A10G (4-bit quantized).
 
 Deployed with: modal deploy modal_functions/gemma.py
 Called from Django ModalBackend via modal.Function.from_name().
@@ -18,9 +18,10 @@ model_vol = modal.Volume.from_name("gemma-model-cache", create_if_missing=True)
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
-        "torch==2.3.0",
+        "torch==2.6.0",
         "transformers>=4.51.0,<5.0.0",
         "accelerate",
+        "bitsandbytes",
         "Pillow",
         "sentencepiece",
         "protobuf",
@@ -30,7 +31,12 @@ image = (
 
 with image.imports():
     import torch
-    from transformers import AutoProcessor, AutoModelForImageTextToText, TextIteratorStreamer
+    from transformers import (
+        AutoProcessor,
+        AutoModelForImageTextToText,
+        BitsAndBytesConfig,
+        TextIteratorStreamer,
+    )
 
 _processor = None
 _model = None
@@ -41,12 +47,20 @@ def _load_model():
     if _model is not None:
         return
     hf_token = os.environ.get("HF_TOKEN")
-    _processor = AutoProcessor.from_pretrained(MODEL_ID, cache_dir=CACHE_DIR, token=hf_token)
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+    )
+    _processor = AutoProcessor.from_pretrained(
+        MODEL_ID, cache_dir=CACHE_DIR, token=hf_token, use_fast=True
+    )
     _model = AutoModelForImageTextToText.from_pretrained(
         MODEL_ID,
         cache_dir=CACHE_DIR,
         token=hf_token,
-        torch_dtype=torch.bfloat16,
+        quantization_config=bnb_config,
         device_map="auto",
     )
     _model.eval()
@@ -104,26 +118,23 @@ def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str
 
     streamer = TextIteratorStreamer(_processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
 
-    gen_kwargs = {
+    thread = threading.Thread(target=_model.generate, kwargs={
         **inputs,
         "max_new_tokens": max_new_tokens,
         "temperature": temperature,
         "do_sample": temperature > 0,
         "streamer": streamer,
-    }
-
-    thread = threading.Thread(target=_model.generate, kwargs=gen_kwargs)
+    })
     thread.start()
 
     chunk_id = "chatcmpl-modal-gemma"
     for token in streamer:
         if token:
-            payload = {
+            yield json.dumps({
                 "id": chunk_id,
                 "object": "chat.completion.chunk",
                 "choices": [{"index": 0, "delta": {"content": token}, "finish_reason": None}],
-            }
-            yield json.dumps(payload)
+            })
 
     thread.join()
 
