@@ -13,4 +13,4 @@ httpx>=0.27,<1.0
 pyyaml>=6.0,<7.0
 ruamel.yaml>=0.18,<0.19
 whitenoise>=6.8,<7.0
-modal>=0.73,<1.0
+modal>=1.0
