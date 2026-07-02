@@ -27,7 +27,7 @@ class SegmentView(View):
     def _segment_modal(self, image_bytes: bytes, prompt: str):
         try:
             import modal
-            fn = modal.Function.lookup("biomedparse", "segment")
+            fn = modal.Function.from_name("biomedparse", "segment")
             result = fn.remote(image_bytes, prompt)
             return JsonResponse(result)
         except Exception as exc:

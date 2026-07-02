@@ -27,7 +27,7 @@ class SegmentView(View):
     def _segment_modal(self, nifti_bytes: bytes, filename: str):
         try:
             import modal
-            fn = modal.Function.lookup("vessel", "segment")
+            fn = modal.Function.from_name("vessel", "segment")
             result = fn.remote(nifti_bytes, filename)
             # mask_b64 is for download endpoint — don't send to frontend
             result.pop("mask_b64", None)

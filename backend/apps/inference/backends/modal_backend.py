@@ -29,7 +29,7 @@ class ModalBackend:
     async def chat_completions(self, req: ChatRequest) -> AsyncIterator[Chunk]:
         import modal
 
-        fn = modal.Function.lookup("gemma", "chat_stream")
+        fn = modal.Function.from_name("gemma", "chat_stream")
 
         async for token_json in fn.remote_gen.aio(req.messages, req.extra or {}):
             yield Chunk(delta=token_json)
