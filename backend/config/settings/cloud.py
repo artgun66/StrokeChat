@@ -6,9 +6,11 @@ DEBUG = False
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
 
-# Postgres provided by Render
 DATABASES = {
-    "default": env.db("DATABASE_URL")
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "/opt/render/project/src/db.sqlite3",
+    }
 }
 
 # Static files — WhiteNoise serves them directly from Django on Render
