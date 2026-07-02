@@ -7,10 +7,14 @@ import path from "node:path";
 // the frontend origin. No server-side proxy — direct CORS is simpler and avoids Next's
 // rewrite mangling DRF's trailing slashes. The backend port is fixed (the supervisor pins
 // 8000 with conflict detection) precisely because it is baked into the browser bundle here.
+const isVercel = !!process.env.VERCEL;
+
 const config: NextConfig = {
-  output: "standalone",
-  // pnpm monorepo: trace workspace deps from the repo root so the standalone bundle is complete.
-  outputFileTracingRoot: path.join(__dirname, "../../"),
+  // standalone is needed for desktop (Tauri) and Docker; Vercel manages its own output
+  ...(isVercel ? {} : {
+    output: "standalone",
+    outputFileTracingRoot: path.join(__dirname, "../../"),
+  }),
   transpilePackages: ["@local-llm/ui", "@local-llm/auth", "@local-llm/api-client"],
   reactStrictMode: true,
 };
