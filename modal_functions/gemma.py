@@ -35,7 +35,7 @@ image = (
     volumes={CACHE_DIR: model_vol},
     timeout=30,
     memory=32768,
-    secrets=[modal.Secret.from_dict({"HF_TOKEN": os.environ.get("HF_TOKEN", "")})],
+    secrets=[modal.Secret.from_name("hf-secret")],
 )
 def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str]:
     """Stream Gemma response tokens. Each yielded string is an OpenAI-format SSE JSON chunk."""
