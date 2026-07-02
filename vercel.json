@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
   "buildCommand": "pnpm --filter product build",
-  "outputDirectory": "frontend/apps/product/.next",
   "installCommand": "pnpm install"
 }
