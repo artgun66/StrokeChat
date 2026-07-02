@@ -34,7 +34,7 @@ image = (
     gpu="A10G",
     image=image,
     volumes={"/nnUNet_weights": weights_vol},
-    timeout=1200,
+    timeout=30,
     memory=16384,
 )
 def segment(nifti_bytes: bytes, filename: str) -> dict:
@@ -113,10 +113,11 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
         with open(pred_path, "rb") as f:
             mask_bytes = f.read()
 
-    return {
+    import json
+    return json.dumps({
         "job_id": job_id,
-        "vessel_voxels": vessel_voxels,
+        "vessel_voxels": int(vessel_voxels),
         "preview_image": _b64_png(orig_rgb),
         "overlay_image": _b64_png(overlay),
         "mask_b64": base64.b64encode(mask_bytes).decode(),
-    }
+    })
