@@ -8,7 +8,7 @@ import modal
 
 app = modal.App("vessel")
 
-WEIGHTS_DIR = "/nnUNet_weights"
+WEIGHTS_DIR = "/nnUNet_weights/nnUNet_weights"
 
 weights_vol = modal.Volume.from_name("vessel-weights", create_if_missing=True)
 
@@ -34,7 +34,7 @@ image = (
     gpu="A10G",
     image=image,
     volumes={"/nnUNet_weights": weights_vol},
-    timeout=30,
+    timeout=600,
     memory=16384,
 )
 def segment(nifti_bytes: bytes, filename: str) -> dict:
@@ -85,6 +85,7 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
             "-tr", "nnUNetTrainer",
             "-p", "nnUNetResEncUNetLPlans",
             "-f", "all",
+            "-chk", "checkpoint_best.pth",
             "--continue_prediction",
         ]
         result = subprocess.run(cmd, env=env, capture_output=True, text=True)
