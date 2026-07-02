@@ -39,3 +39,8 @@ CORS_ALLOWED_ORIGINS = env.list(
     default=["https://*.vercel.app"],
 )
 CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=False)
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+}
