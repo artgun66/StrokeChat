@@ -1,4 +1,4 @@
-"""Gemma 3 27B-IT inference on Modal A10G (4-bit quantized).
+"""Gemma 3 27B-IT inference on Modal A100 80GB (bfloat16, no quantization).
 
 Deployed with: modal deploy modal_functions/gemma.py
 Called from Django ModalBackend via modal.Function.from_name().
@@ -19,9 +19,9 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
         "torch==2.6.0",
+        "torchvision",
         "transformers>=4.51.0,<5.0.0",
         "accelerate",
-        "bitsandbytes",
         "Pillow",
         "sentencepiece",
         "protobuf",
@@ -34,7 +34,6 @@ with image.imports():
     from transformers import (
         AutoProcessor,
         AutoModelForImageTextToText,
-        BitsAndBytesConfig,
         TextIteratorStreamer,
     )
 
@@ -47,12 +46,6 @@ def _load_model():
     if _model is not None:
         return
     hf_token = os.environ.get("HF_TOKEN")
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.bfloat16,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-    )
     _processor = AutoProcessor.from_pretrained(
         MODEL_ID, cache_dir=CACHE_DIR, token=hf_token, use_fast=True
     )
@@ -60,14 +53,14 @@ def _load_model():
         MODEL_ID,
         cache_dir=CACHE_DIR,
         token=hf_token,
-        quantization_config=bnb_config,
+        dtype=torch.bfloat16,
         device_map="auto",
     )
     _model.eval()
 
 
 @app.function(
-    gpu="A10G",
+    gpu="a100-80gb",
     image=image,
     volumes={CACHE_DIR: model_vol},
     timeout=300,
