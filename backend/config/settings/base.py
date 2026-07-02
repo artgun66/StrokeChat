@@ -46,6 +46,7 @@ LOCAL_APPS = [
     "apps.gpu_pool",
     "apps.tasks",
     "apps.biomedparse",
+    "apps.vessel_segmentation",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

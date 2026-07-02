@@ -29,4 +29,5 @@ urlpatterns = [
     # OpenAI-compatible at root, so any OpenAI client works without a prefix change.
     path("v1/", include("apps.inference.urls", namespace="inference")),
     path("api/biomedparse/", include("apps.biomedparse.urls")),
+    path("api/vessel/", include("apps.vessel_segmentation.urls")),
 ]
