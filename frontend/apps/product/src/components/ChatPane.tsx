@@ -5,7 +5,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { AvailableModel } from "../app/(app)/threads/view/ThreadView";
 import { api, apiBaseUrl } from "../lib/api";
 import { CustomInstructions } from "./CustomInstructions";
-import { MessageInput, type ImageAttachment, type MessageInputHandle } from "./MessageInput";
+import { MessageInput, type ImageAttachment, type NiftiAttachment, type MessageInputHandle } from "./MessageInput";
 
 type BiomedResult = {
   target: "bleeding" | "stroke";
@@ -15,13 +15,23 @@ type BiomedResult = {
   original_image: string;
 };
 
+type VesselResult = {
+  job_id: string;
+  vessel_voxels: number;
+  preview_image: string;
+  overlay_image: string;
+};
+
 type DisplayMessage = {
   role: "user" | "assistant" | "system";
   content: string;
   reasoning?: string;
   pending?: boolean;
+  attachedImages?: string[];
   biomedResults?: BiomedResult[];
   biomedPending?: boolean;
+  vesselResults?: VesselResult[];
+  vesselPending?: boolean;
 };
 
 type Props = {
@@ -74,6 +84,18 @@ async function runBiomedParse(img: ImageAttachment, target: "bleeding" | "stroke
   }
 }
 
+async function runVesselSegment(nifti: NiftiAttachment): Promise<VesselResult | null> {
+  try {
+    const fd = new FormData();
+    fd.append("scan", nifti.file, nifti.name);
+    const resp = await fetch(`${apiBaseUrl}/api/vessel/segment/`, { method: "POST", body: fd });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch {
+    return null;
+  }
+}
+
 export function ChatPane({
   threadId,
   initialMessages,
@@ -115,15 +137,17 @@ export function ChatPane({
     didInitialScroll.current = true;
   }, [messages]);
 
-  async function send(text: string, images: ImageAttachment[]) {
-    if ((!text.trim() && images.length === 0) || busy || !modelSlug) return;
+  async function send(text: string, images: ImageAttachment[], niftis: NiftiAttachment[]) {
+    if ((!text.trim() && images.length === 0 && niftis.length === 0) || busy || !modelSlug) return;
     setError(null);
 
-    const visibleText = text.trim() || "(CT scan submitted for analysis)";
+    const visibleText = text.trim() || (niftis.length > 0 ? "(CTA scan submitted for vessel analysis)" : "(CT scan submitted for analysis)");
     const userMsg: DisplayMessage = {
       role: "user",
       content: visibleText,
+      attachedImages: images.map((img) => img.dataUrl),
       biomedPending: images.length > 0,
+      vesselPending: niftis.length > 0,
     };
 
     setMessages((prev) => [
@@ -133,7 +157,7 @@ export function ChatPane({
     ]);
     setBusy(true);
 
-    // ── 1. Run BiomedParse on every image ──────────────────────────────────
+    // ── 1a. Run BiomedParse on every image ─────────────────────────────────
     let biomedResults: BiomedResult[] = [];
     if (images.length > 0) {
       const target = detectTarget(text);
@@ -143,9 +167,21 @@ export function ChatPane({
       setMessages((prev) => {
         const copy = [...prev];
         const userIdx = copy.length - 2;
-        if (userIdx >= 0) {
-          copy[userIdx] = { ...copy[userIdx], biomedResults, biomedPending: false };
-        }
+        if (userIdx >= 0) copy[userIdx] = { ...copy[userIdx], biomedResults, biomedPending: false };
+        return copy;
+      });
+    }
+
+    // ── 1b. Run vessel segmentation on every NIfTI ─────────────────────────
+    let vesselResults: VesselResult[] = [];
+    if (niftis.length > 0) {
+      const settled = await Promise.all(niftis.map((n) => runVesselSegment(n)));
+      vesselResults = settled.filter((r): r is VesselResult => r !== null);
+
+      setMessages((prev) => {
+        const copy = [...prev];
+        const userIdx = copy.length - 2;
+        if (userIdx >= 0) copy[userIdx] = { ...copy[userIdx], vesselResults, vesselPending: false };
         return copy;
       });
     }
@@ -159,7 +195,14 @@ export function ChatPane({
         }).join("\n\n") + "\n\n"
       : "";
 
-    const userContent = biomedContext + (text.trim() || "Based on this CT scan analysis, what can you tell me about the findings? Explain what this means clinically.");
+    const vesselContext = vesselResults.length > 0
+      ? vesselResults.map((r) => {
+          const voxelsMil = (r.vessel_voxels / 1_000_000).toFixed(2);
+          return `[Vessel Segmentation Analysis]\nVessel voxels detected: ${r.vessel_voxels} (${voxelsMil}M)\nModel: nnUNet robust-vessel-segmentation Dataset241`;
+        }).join("\n\n") + "\n\n"
+      : "";
+
+    const userContent = biomedContext + vesselContext + (text.trim() || (vesselResults.length > 0 ? "Based on the vessel segmentation results, what can you tell me about the vascular anatomy and any clinical implications?" : "Based on this CT scan analysis, what can you tell me about the findings? Explain what this means clinically."));
 
     // ── 3. Build OpenAI-format history for the LLM ─────────────────────────
     // For any prior user message that had BiomedParse results, reconstruct the
@@ -177,7 +220,18 @@ export function ChatPane({
         const userText = m.content === "(CT scan submitted for analysis)" ? "Analyse these findings." : m.content;
         return { role: m.role, content: ctx + "\n\n" + userText };
       });
-    apiMessages.push({ role: "user", content: userContent });
+    // Include the actual images in the LLM message so Qwen can see them.
+    if (images.length > 0 && currentModelHasVision) {
+      apiMessages.push({
+        role: "user",
+        content: [
+          ...images.map((img) => ({ type: "image_url" as const, image_url: { url: img.dataUrl } })),
+          { type: "text" as const, text: userContent },
+        ],
+      });
+    } else {
+      apiMessages.push({ role: "user", content: userContent });
+    }
 
     // ── 4. Stream LLM response ─────────────────────────────────────────────
     let contentAssembled = "";
@@ -275,7 +329,7 @@ export function ChatPane({
             )}
           </p>
           <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-            CT images are analysed by BiomedParse — drop one to get started
+            Drop a CT image → BiomedParse · Drop a .nii.gz CTA → vessel segmentation
           </p>
         </div>
         <div className="flex w-full flex-col gap-1 sm:w-auto sm:shrink-0 sm:items-end">
@@ -329,11 +383,29 @@ export function ChatPane({
                 }>
                   <p className="mb-1 text-[10px] uppercase tracking-[0.18em] text-[var(--muted)]">{m.role}</p>
 
+                  {/* Uploaded image thumbnails */}
+                  {m.attachedImages && m.attachedImages.length > 0 && (
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {m.attachedImages.map((src, ii) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img key={ii} src={src} alt="Uploaded scan" className="h-28 w-28 rounded-lg object-cover border border-white/10" />
+                      ))}
+                    </div>
+                  )}
+
                   {/* BiomedParse loading state */}
                   {m.biomedPending && (
                     <div className="mb-3 flex items-center gap-2 rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2">
                       <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
-                      <span className="text-xs text-[var(--muted)]">Analysing CT scan with BiomedParse…</span>
+                      <span className="text-xs text-[var(--muted)]">Analysing CT scan with BiomedParse (CPU — takes ~2-3 min)…</span>
+                    </div>
+                  )}
+
+                  {/* Vessel segmentation loading state */}
+                  {m.vesselPending && (
+                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2">
+                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-cyan-500/20 border-t-cyan-400" />
+                      <span className="text-xs text-cyan-400">Running vessel segmentation (may take a few minutes)…</span>
                     </div>
                   )}
 
@@ -366,6 +438,42 @@ export function ChatPane({
                           </div>
                           <p className="mt-2 text-[10px] italic text-[var(--muted)]/70">
                             BiomedParse fine-tuned model · not for clinical use
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Vessel segmentation results */}
+                  {m.vesselResults && m.vesselResults.length > 0 && (
+                    <div className="mb-3 space-y-3">
+                      {m.vesselResults.map((r, ri) => (
+                        <div key={ri} className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50" />
+                            <p className="text-sm font-semibold text-cyan-300">
+                              Vessel segmentation complete
+                            </p>
+                            <span className="ml-auto text-xs text-cyan-400/70">
+                              {r.vessel_voxels >= 1_000_000
+                                ? `${(r.vessel_voxels / 1_000_000).toFixed(2)}M`
+                                : `${(r.vessel_voxels / 1000).toFixed(1)}K`} vessel voxels
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <p className="mb-1 text-[9px] uppercase tracking-wider text-[var(--muted)]">CT axial slice</p>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={`data:image/png;base64,${r.preview_image}`} alt="CT axial slice" className="w-full rounded-lg" />
+                            </div>
+                            <div>
+                              <p className="mb-1 text-[9px] uppercase tracking-wider text-[var(--muted)]">Vessel overlay</p>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={`data:image/png;base64,${r.overlay_image}`} alt="Vessel overlay" className="w-full rounded-lg" />
+                            </div>
+                          </div>
+                          <p className="mt-2 text-[10px] italic text-[var(--muted)]/70">
+                            nnUNet robust-vessel-segmentation · not for clinical use
                           </p>
                         </div>
                       ))}

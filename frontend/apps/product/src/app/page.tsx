@@ -29,7 +29,7 @@ const CAPABILITIES = [
       </svg>
     ),
     title: "Analyse a CT scan",
-    description: "Upload a non-contrast CT brain image. The AI segments and highlights hemorrhagic or ischemic lesions with a confidence score.",
+    description: "Upload a non-contrast CT brain image. The AI segments and highlights hemorrhagic or ischemic lesions.",
     href: "/biomedparse",
     cta: "Upload scan",
     accent: "from-red-500/80 to-red-700/80",
