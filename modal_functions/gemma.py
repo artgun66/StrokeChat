@@ -19,7 +19,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
         "torch==2.3.0",
-        "transformers==4.47.0",
+        "transformers>=4.51.0,<5.0.0",
         "accelerate",
         "Pillow",
         "sentencepiece",
