@@ -56,7 +56,7 @@ def _load_model():
     gpu="A10G",
     image=image,
     volumes={CACHE_DIR: model_vol},
-    timeout=30,
+    timeout=300,
     memory=32768,
     secrets=[modal.Secret.from_name("hf-secret")],
 )
