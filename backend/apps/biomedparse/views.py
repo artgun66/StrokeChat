@@ -25,14 +25,19 @@ class SegmentView(View):
         return self._segment_local(image, prompt)
 
     def _segment_modal(self, image_bytes: bytes, prompt: str):
+        import base64
+        endpoint = os.environ.get(
+            "MODAL_BIOMEDPARSE_URL",
+            "https://gunturkunartun--biomedparse-segment.modal.run",
+        )
         try:
-            import json as _json
-            import modal
-            fn = modal.Function.from_name("biomedparse", "segment")
-            result = fn.remote(image_bytes, prompt)
-            if isinstance(result, str):
-                result = _json.loads(result)
-            return JsonResponse(result)
+            resp = httpx.post(
+                endpoint,
+                json={"image_b64": base64.b64encode(image_bytes).decode(), "prompt": prompt},
+                timeout=180.0,
+            )
+            resp.raise_for_status()
+            return JsonResponse(resp.json())
         except Exception as exc:
             return JsonResponse({"error": f"Modal inference error: {exc}"}, status=500)
 
