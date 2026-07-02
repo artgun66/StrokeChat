@@ -4,7 +4,6 @@ djangorestframework-simplejwt>=5.3,<6.0
 django-cors-headers>=4.6,<5.0
 django-environ>=0.11,<0.12
 django-storages>=1.14,<2.0
-psycopg[binary]>=3.2,<4.0
 uvicorn[standard]>=0.32,<1.0
 gunicorn>=23.0,<24.0
 cryptography>=43,<46
