@@ -26,9 +26,12 @@ class SegmentView(View):
 
     def _segment_modal(self, image_bytes: bytes, prompt: str):
         try:
+            import json as _json
             import modal
             fn = modal.Function.from_name("biomedparse", "segment")
             result = fn.remote(image_bytes, prompt)
+            if isinstance(result, str):
+                result = _json.loads(result)
             return JsonResponse(result)
         except Exception as exc:
             return JsonResponse({"error": f"Modal inference error: {exc}"}, status=500)

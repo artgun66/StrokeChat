@@ -26,10 +26,12 @@ class SegmentView(View):
 
     def _segment_modal(self, nifti_bytes: bytes, filename: str):
         try:
+            import json as _json
             import modal
             fn = modal.Function.from_name("vessel", "segment")
             result = fn.remote(nifti_bytes, filename)
-            # mask_b64 is for download endpoint — don't send to frontend
+            if isinstance(result, str):
+                result = _json.loads(result)
             result.pop("mask_b64", None)
             return JsonResponse(result)
         except Exception as exc:
