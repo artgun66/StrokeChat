@@ -1,7 +1,7 @@
 """Gemma 3 27B-IT inference on Modal A10G.
 
 Deployed with: modal deploy modal_functions/gemma.py
-Called from Django ModalBackend via modal.Function.lookup().
+Called from Django ModalBackend via modal.Function.from_name().
 """
 import os
 from typing import Iterator
@@ -19,7 +19,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
         "torch==2.3.0",
-        "transformers>=4.50.0",
+        "transformers==4.47.0",
         "accelerate",
         "Pillow",
         "sentencepiece",
@@ -28,12 +28,35 @@ image = (
     )
 )
 
+with image.imports():
+    import torch
+    from transformers import AutoProcessor, AutoModelForImageTextToText, TextIteratorStreamer
+
+_processor = None
+_model = None
+
+
+def _load_model():
+    global _processor, _model
+    if _model is not None:
+        return
+    hf_token = os.environ.get("HF_TOKEN")
+    _processor = AutoProcessor.from_pretrained(MODEL_ID, cache_dir=CACHE_DIR, token=hf_token)
+    _model = AutoModelForImageTextToText.from_pretrained(
+        MODEL_ID,
+        cache_dir=CACHE_DIR,
+        token=hf_token,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    )
+    _model.eval()
+
 
 @app.function(
     gpu="A10G",
     image=image,
     volumes={CACHE_DIR: model_vol},
-    timeout=30,
+    timeout=600,
     memory=32768,
     secrets=[modal.Secret.from_name("hf-secret")],
 )
@@ -41,26 +64,10 @@ def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str
     """Stream Gemma response tokens. Each yielded string is an OpenAI-format SSE JSON chunk."""
     import json
     import threading
-
-    import torch
-    from transformers import AutoProcessor, AutoModelForImageTextToText, TextIteratorStreamer
-
-    hf_token = os.environ.get("HF_TOKEN")
-
-    # Load model (cached in volume after first run)
-    processor = AutoProcessor.from_pretrained(MODEL_ID, cache_dir=CACHE_DIR, token=hf_token)
-    model = AutoModelForImageTextToText.from_pretrained(
-        MODEL_ID,
-        cache_dir=CACHE_DIR,
-        token=hf_token,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",
-    )
-    model.eval()
-
-    # Build input — handle vision messages (image_url content blocks)
-    from PIL import Image as PILImage
     import base64, io, re
+    from PIL import Image as PILImage
+
+    _load_model()
 
     processed_messages = []
     images = []
@@ -83,19 +90,19 @@ def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str
         else:
             processed_messages.append(msg)
 
-    chat_text = processor.apply_chat_template(
+    chat_text = _processor.apply_chat_template(
         processed_messages, tokenize=False, add_generation_prompt=True
     )
 
     if images:
-        inputs = processor(text=chat_text, images=images, return_tensors="pt").to(model.device)
+        inputs = _processor(text=chat_text, images=images, return_tensors="pt").to(_model.device)
     else:
-        inputs = processor(text=chat_text, return_tensors="pt").to(model.device)
+        inputs = _processor(text=chat_text, return_tensors="pt").to(_model.device)
 
     max_new_tokens = (extra or {}).get("max_tokens", 1024)
     temperature = (extra or {}).get("temperature", 0.7)
 
-    streamer = TextIteratorStreamer(processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
+    streamer = TextIteratorStreamer(_processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
 
     gen_kwargs = {
         **inputs,
@@ -105,7 +112,7 @@ def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str
         "streamer": streamer,
     }
 
-    thread = threading.Thread(target=model.generate, kwargs=gen_kwargs)
+    thread = threading.Thread(target=_model.generate, kwargs=gen_kwargs)
     thread.start()
 
     chunk_id = "chatcmpl-modal-gemma"
@@ -120,9 +127,8 @@ def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str
 
     thread.join()
 
-    done_payload = {
+    yield json.dumps({
         "id": chunk_id,
         "object": "chat.completion.chunk",
         "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
-    }
-    yield json.dumps(done_payload)
+    })
