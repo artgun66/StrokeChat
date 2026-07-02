@@ -116,13 +116,13 @@ export default function VesselSegmentationPage() {
                 <p className="text-sm text-[var(--muted)]">
                   Drop a CTA scan or <span className="text-[var(--accent)]">browse</span>
                 </p>
-                <p className="text-[11px] text-[var(--muted)]/50">NIfTI (.nii.gz or .nii)</p>
+                <p className="text-[11px] text-[var(--muted)]/50">NIfTI (.nii.gz, .nii) or NRRD (.nrrd)</p>
               </div>
             )}
             <input
               ref={inputRef}
               type="file"
-              accept=".nii,.nii.gz,application/gzip"
+              accept=".nii,.nii.gz,.nrrd,.mhd,.mha,application/gzip"
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
             />

@@ -42,7 +42,22 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
 
     import nibabel as nib
     import numpy as np
+    import SimpleITK as sitk
     from PIL import Image
+
+    # Convert NRRD / MHD / other formats to NIfTI bytes
+    if filename.lower().endswith((".nrrd", ".mhd", ".mha")):
+        with tempfile.NamedTemporaryFile(suffix=os.path.splitext(filename)[1], delete=False) as f:
+            f.write(nifti_bytes)
+            tmp_in = f.name
+        tmp_out = tmp_in + ".nii.gz"
+        img = sitk.ReadImage(tmp_in)
+        sitk.WriteImage(img, tmp_out)
+        with open(tmp_out, "rb") as f:
+            nifti_bytes = f.read()
+        os.unlink(tmp_in)
+        os.unlink(tmp_out)
+        filename = filename.rsplit(".", 1)[0] + ".nii.gz"
 
     job_id = str(uuid.uuid4())
 
