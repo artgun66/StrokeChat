@@ -3,6 +3,11 @@
 import { useCallback, useRef, useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Large files (NRRD/NIfTI) exceed Render's ~30 MB body limit, so upload directly
+// to the Modal HTTP endpoint which has no such restriction.
+const VESSEL_URL =
+  process.env.NEXT_PUBLIC_VESSEL_URL ??
+  "https://gunturkunartun--vessel-vessel-api.modal.run";
 
 type Result = {
   job_id: string;
@@ -42,7 +47,7 @@ export default function VesselSegmentationPage() {
     try {
       const fd = new FormData();
       fd.append("scan", file);
-      const resp = await fetch(`${API}/api/vessel/segment/`, { method: "POST", body: fd });
+      const resp = await fetch(`${VESSEL_URL}/segment`, { method: "POST", body: fd });
       if (!resp.ok) {
         const text = await resp.text().catch(() => "");
         let msg = "Request failed";

@@ -3,6 +3,9 @@
 Deployed with: modal deploy modal_functions/vessel.py
 Weights uploaded once with:
   modal volume put vessel-weights vessel_weights/nnUNet_weights /nnUNet_weights
+
+HTTP endpoint (for direct browser upload — bypasses Render size limit):
+  https://gunturkunartun--vessel-vessel-api.modal.run/segment
 """
 import modal
 
@@ -26,6 +29,8 @@ image = (
         "scikit-image",
         "acvl-utils",
         "dynamic-network-architectures",
+        "fastapi[standard]",
+        "python-multipart",
     )
 )
 
@@ -37,8 +42,8 @@ image = (
     timeout=600,
     memory=16384,
 )
-def segment(nifti_bytes: bytes, filename: str) -> dict:
-    import base64, io, os, shutil, tempfile, uuid
+def segment(nifti_bytes: bytes, filename: str) -> str:
+    import base64, io, os, tempfile, uuid
 
     import nibabel as nib
     import numpy as np
@@ -68,7 +73,6 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
         os.makedirs(infer_dir)
         os.makedirs(pred_dir)
 
-        # nnUNet expects _0000 channel suffix
         base = filename.replace(".nii.gz", "").replace(".nii", "")
         scan_path = os.path.join(infer_dir, f"{base}_0000.nii.gz")
         with open(scan_path, "wb") as f:
@@ -92,18 +96,15 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
         if result.returncode != 0:
             raise RuntimeError(f"nnUNetv2_predict failed:\n{result.stderr[-3000:]}")
 
-        # Find output file (nnUNet strips _0000)
         pred_files = [f for f in os.listdir(pred_dir) if f.endswith(".nii.gz")]
         if not pred_files:
             raise RuntimeError("nnUNet produced no output file")
         pred_path = os.path.join(pred_dir, pred_files[0])
 
-        # Count vessel voxels
         mask_img = nib.load(pred_path)
         mask_data = np.asarray(mask_img.dataobj)
         vessel_voxels = int(np.sum(mask_data > 0))
 
-        # Generate axial slice preview
         orig_img = nib.load(scan_path)
         orig_data = np.asarray(orig_img.dataobj, dtype=np.float32)
         mid = orig_data.shape[2] // 2
@@ -125,7 +126,6 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
             Image.fromarray(arr).save(buf, format="PNG")
             return base64.b64encode(buf.getvalue()).decode()
 
-        # Read mask file for download
         with open(pred_path, "rb") as f:
             mask_bytes = f.read()
 
@@ -137,3 +137,35 @@ def segment(nifti_bytes: bytes, filename: str) -> dict:
         "overlay_image": _b64_png(overlay),
         "mask_b64": base64.b64encode(mask_bytes).decode(),
     })
+
+
+# HTTP endpoint — browser uploads directly here, bypassing Render's ~30MB body limit
+@app.function(image=image)
+@modal.asgi_app()
+def vessel_api():
+    from fastapi import FastAPI, File, UploadFile, HTTPException
+    from fastapi.middleware.cors import CORSMiddleware
+    import json
+
+    web_app = FastAPI()
+    web_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["POST", "OPTIONS"],
+        allow_headers=["*"],
+    )
+
+    @web_app.post("/segment")
+    async def http_segment(scan: UploadFile = File(...)):
+        nifti_bytes = await scan.read()
+        if not nifti_bytes:
+            raise HTTPException(status_code=400, detail="Empty file")
+        try:
+            result_json = segment.remote(nifti_bytes, scan.filename or "scan.nii.gz")
+            result = json.loads(result_json) if isinstance(result_json, str) else result_json
+            result.pop("mask_b64", None)
+            return result
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
+
+    return web_app
