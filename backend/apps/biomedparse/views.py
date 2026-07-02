@@ -34,7 +34,7 @@ class SegmentView(View):
             resp = httpx.post(
                 endpoint,
                 json={"image_b64": base64.b64encode(image_bytes).decode(), "prompt": prompt},
-                timeout=180.0,
+                timeout=30.0,
             )
             resp.raise_for_status()
             return JsonResponse(resp.json())

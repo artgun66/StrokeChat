@@ -1,7 +1,9 @@
-"""BiomedParse inference on Modal A10G.
+"""BiomedParse inference on Modal A10G — served as an HTTP web endpoint.
 
 Deployed with: modal deploy modal_functions/biomedparse.py
 Weights uploaded once with: modal volume put biomedparse-weights <local_ckpt> /checkpoints/last-v5.ckpt
+Call from Django: POST https://gunturkunartun--biomedparse-segment.modal.run
+  with JSON body: {"image_b64": "<base64>", "prompt": "..."}
 """
 import modal
 
@@ -17,14 +19,17 @@ image = (
     modal.Image.from_registry("pytorch/pytorch:2.2.0-cuda11.8-cudnn8-runtime")
     .apt_install("libgl1", "libglib2.0-0", "git")
     .pip_install(
+        "torch==2.2.0",
+        "torchvision==0.17.0",
+        "fastapi[standard]",
         "opencv-python-headless",
         "Pillow",
-        "numpy",
+        "numpy<2.0",
         "hydra-core==1.3.2",
         "omegaconf",
         "einops",
         "timm",
-        "transformers",
+        "transformers==4.47.0",
         "huggingface_hub",
         "pydicom[all]",
         "open_clip_torch",
@@ -33,15 +38,10 @@ image = (
         "scipy",
         "scikit-image",
         "panopticapi @ git+https://github.com/cocodataset/panopticapi.git",
+        "fvcore",
     )
-    .add_local_dir(
-        "artun_model/BiomedParse",
-        remote_path=BIOMEDPARSE_SRC,
-    )
-    .add_local_dir(
-        "biomedparse_service/detectron2_shim",
-        remote_path=SHIM_SRC,
-    )
+    .add_local_dir("artun_model/BiomedParse", remote_path=BIOMEDPARSE_SRC)
+    .add_local_dir("biomedparse_service/detectron2_shim", remote_path=SHIM_SRC)
 )
 
 
@@ -49,21 +49,25 @@ image = (
     gpu="A10G",
     image=image,
     volumes={"/weights": weights_vol},
-    timeout=120,
+    timeout=30,
     memory=16384,
 )
-def segment(image_bytes: bytes, prompt: str) -> dict:
+@modal.fastapi_endpoint(method="POST")
+def segment(item: dict):
     import base64, io, os, sys
-
     import cv2
     import numpy as np
     import torch
     import torch.nn.functional as F
+    from fastapi.responses import JSONResponse
     from PIL import Image
 
-    # Wire up detectron2 shim before importing BiomedParse
+    image_b64 = item.get("image_b64", "")
+    prompt = item.get("prompt", "is there a bleeding in the image")
+    image_bytes = base64.b64decode(image_b64)
+
     sys.path.insert(0, BIOMEDPARSE_SRC)
-    sys.path.insert(0, "/")  # detectron2_shim lives at root
+    sys.path.insert(0, "/")
     import detectron2_shim as _d2
     import detectron2_shim.layers as _d2l
     import detectron2_shim.modeling as _d2m
@@ -84,7 +88,6 @@ def segment(image_bytes: bytes, prompt: str) -> dict:
     }
 
     device = torch.device("cuda")
-
     GlobalHydra.instance().clear()
     hydra.initialize_config_dir(
         config_dir=f"{BIOMEDPARSE_SRC}/configs",
@@ -102,14 +105,12 @@ def segment(image_bytes: bytes, prompt: str) -> dict:
 
     full_prompt = PRESET_PROMPTS.get(prompt.strip().lower(), prompt)
 
-    # Preprocess
     arr = np.frombuffer(image_bytes, dtype=np.uint8)
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (512, 512))
     tensor = torch.from_numpy(img).permute(2, 0, 1).float().unsqueeze(0).to(device)
 
-    # Inference
     with torch.inference_mode():
         out = model({"image": tensor, "text": [full_prompt]}, mode="eval")
 
@@ -137,7 +138,6 @@ def segment(image_bytes: bytes, prompt: str) -> dict:
         if pred_mask.ndim < 2 or pred_mask.shape != (512, 512):
             pred_mask = np.zeros((512, 512), dtype=np.uint8)
 
-    # Overlay
     orig = cv2.resize(img, (512, 512))
     if pred_mask is not None and pred_mask.max() > 0:
         overlay = orig.copy()
@@ -155,9 +155,9 @@ def segment(image_bytes: bytes, prompt: str) -> dict:
         return base64.b64encode(buf.getvalue()).decode()
 
     return {
-        "detected": detected,
-        "confidence": round(prob, 4),
-        "prompt": full_prompt,
+        "detected": bool(detected),
+        "confidence": round(float(prob), 4),
+        "prompt": str(full_prompt),
         "overlay_image": _b64(overlay),
         "original_image": _b64(orig),
     }
