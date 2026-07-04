@@ -41,6 +41,7 @@ image = (
     volumes={"/nnUNet_weights": weights_vol},
     timeout=600,
     memory=16384,
+    min_containers=0,
 )
 def segment(nifti_bytes: bytes, filename: str) -> str:
     import base64, io, os, tempfile, uuid
@@ -139,19 +140,20 @@ def segment(nifti_bytes: bytes, filename: str) -> str:
     })
 
 
-# HTTP endpoint — browser uploads directly here, bypassing Render's ~30MB body limit
-@app.function(image=image)
+# HTTP endpoint — browser uploads directly here, bypassing Render's ~30MB body limit.
+# Async job pattern: POST /segment → {call_id}, GET /result/{call_id} → poll for result.
+@app.function(image=image, memory=2048, timeout=30)
 @modal.asgi_app()
 def vessel_api():
     from fastapi import FastAPI, File, UploadFile, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
-    import json
+    import json, modal as _modal
 
     web_app = FastAPI()
     web_app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
-        allow_methods=["POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )
 
@@ -160,11 +162,21 @@ def vessel_api():
         nifti_bytes = await scan.read()
         if not nifti_bytes:
             raise HTTPException(status_code=400, detail="Empty file")
+        # Spawn GPU inference and return call_id immediately — no waiting
+        call = segment.spawn(nifti_bytes, scan.filename or "scan.nii.gz")
+        return {"call_id": call.object_id, "status": "pending"}
+
+    @web_app.get("/result/{call_id}")
+    async def get_result(call_id: str):
         try:
-            result_json = segment.remote(nifti_bytes, scan.filename or "scan.nii.gz")
+            call = _modal.FunctionCall.from_id(call_id)
+            result_json = call.get(timeout=0)  # raises TimeoutError if still running
             result = json.loads(result_json) if isinstance(result_json, str) else result_json
             result.pop("mask_b64", None)
+            result["status"] = "done"
             return result
+        except TimeoutError:
+            return {"status": "pending"}
         except Exception as exc:
             raise HTTPException(status_code=500, detail=str(exc))
 

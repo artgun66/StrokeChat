@@ -47,14 +47,25 @@ export default function VesselSegmentationPage() {
     try {
       const fd = new FormData();
       fd.append("scan", file);
+      // Step 1: upload file, get call_id immediately
       const resp = await fetch(`${VESSEL_URL}/segment`, { method: "POST", body: fd });
       if (!resp.ok) {
         const text = await resp.text().catch(() => "");
         let msg = "Request failed";
-        try { msg = JSON.parse(text).error ?? msg; } catch { if (text && !text.trimStart().startsWith("<")) msg = text.slice(0, 300); }
+        try { msg = JSON.parse(text).detail ?? JSON.parse(text).error ?? msg; } catch { if (text && !text.trimStart().startsWith("<")) msg = text.slice(0, 300); }
         throw new Error(msg);
       }
-      setResult(await resp.json());
+      const { call_id } = await resp.json();
+      // Step 2: poll until done (GPU inference can take 2-5 min)
+      for (let i = 0; i < 120; i++) {
+        await new Promise(r => setTimeout(r, 5000));
+        const poll = await fetch(`${VESSEL_URL}/result/${call_id}`);
+        if (!poll.ok) throw new Error("Polling failed");
+        const data = await poll.json();
+        if (data.status === "done") { setResult(data); return; }
+        if (data.status !== "pending") throw new Error(data.detail ?? "Inference failed");
+      }
+      throw new Error("Timed out after 10 minutes");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -150,7 +161,7 @@ export default function VesselSegmentationPage() {
             {loading ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                Segmenting… (may take several minutes on CPU)
+                Segmenting… (GPU inference, may take 2–5 min)
               </>
             ) : "Segment vessels"}
           </button>
