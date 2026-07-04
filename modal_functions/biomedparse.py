@@ -51,6 +51,7 @@ image = (
     volumes={"/weights": weights_vol},
     timeout=30,
     memory=16384,
+    min_containers=0,
 )
 @modal.fastapi_endpoint(method="POST")
 def segment(item: dict):
@@ -154,9 +155,21 @@ def segment(item: dict):
         Image.fromarray(arr_rgb).save(buf, format="PNG")
         return base64.b64encode(buf.getvalue()).decode()
 
+    # Mask coverage: fraction of 512×512 image occupied by the segmented region
+    mask_area_pct = (
+        round(float(np.sum(pred_mask > 0)) / (512 * 512) * 100, 2)
+        if pred_mask is not None else 0.0
+    )
+    # Aspect score (0–10): 70% detection confidence + 30% lesion coverage
+    # Coverage component saturates at 5% of image area (typical large lesion)
+    coverage_component = min(mask_area_pct / 5.0, 1.0)
+    aspect_score = round(float(prob) * 7.0 + coverage_component * 3.0, 1)
+
     return {
         "detected": bool(detected),
         "confidence": round(float(prob), 4),
+        "mask_area_pct": mask_area_pct,
+        "aspect_score": aspect_score,
         "prompt": str(full_prompt),
         "overlay_image": _b64(overlay),
         "original_image": _b64(orig),
