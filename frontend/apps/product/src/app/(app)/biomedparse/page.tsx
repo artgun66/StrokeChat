@@ -9,6 +9,212 @@ const PRESETS = [
   { label: "Ischemic Stroke", value: "stroke", short: "Ischemic", color: "amber" },
 ];
 
+// ASPECTS regions: 10 MCA territory zones, each subtracts 1 point when affected
+const ASPECTS_REGIONS = [
+  {
+    id: "C",  label: "C",  full: "Caudate",
+    group: "subcortical", tip: "Caudate head",
+  },
+  {
+    id: "L",  label: "L",  full: "Lentiform",
+    group: "subcortical", tip: "Lentiform nucleus (putamen + globus pallidus)",
+  },
+  {
+    id: "IC", label: "IC", full: "Internal Capsule",
+    group: "subcortical", tip: "Posterior limb of internal capsule",
+  },
+  {
+    id: "I",  label: "I",  full: "Insular Ribbon",
+    group: "subcortical", tip: "Insular cortex ribbon",
+  },
+  {
+    id: "M1", label: "M1", full: "Ant. MCA cortex",
+    group: "cortical", tip: "Anterior MCA cortex (ganglionic level)",
+  },
+  {
+    id: "M2", label: "M2", full: "Lat. to insula",
+    group: "cortical", tip: "MCA cortex lateral to insular ribbon",
+  },
+  {
+    id: "M3", label: "M3", full: "Post. MCA cortex",
+    group: "cortical", tip: "Posterior MCA cortex (ganglionic level)",
+  },
+  {
+    id: "M4", label: "M4", full: "Sup. ant. MCA",
+    group: "cortical", tip: "Anterior MCA cortex superior to M1",
+  },
+  {
+    id: "M5", label: "M5", full: "Sup. lat. MCA",
+    group: "cortical", tip: "Lateral MCA cortex superior to M2",
+  },
+  {
+    id: "M6", label: "M6", full: "Sup. post. MCA",
+    group: "cortical", tip: "Posterior MCA cortex superior to M3",
+  },
+] as const;
+
+type RegionId = typeof ASPECTS_REGIONS[number]["id"];
+
+function aspectsInterpretation(score: number) {
+  if (score === 10) return { label: "Normal", color: "text-green-300", bg: "bg-green-500/10 border-green-500/30" };
+  if (score >= 8)   return { label: "Minor ischemia — IV tPA favorable", color: "text-blue-300", bg: "bg-blue-500/10 border-blue-500/30" };
+  if (score >= 7)   return { label: "Moderate — treat with caution", color: "text-amber-300", bg: "bg-amber-500/10 border-amber-500/30" };
+  if (score >= 5)   return { label: "Extensive — high hemorrhagic risk", color: "text-orange-300", bg: "bg-orange-500/10 border-orange-500/30" };
+  return { label: "Severe — very poor prognosis", color: "text-red-300", bg: "bg-red-500/10 border-red-500/30" };
+}
+
+function AspectsScorer({ confidence, maskAreaPct }: { confidence: number; maskAreaPct: number }) {
+  const [affected, setAffected] = useState<Set<RegionId>>(new Set());
+
+  const toggle = (id: RegionId) =>
+    setAffected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  const score = 10 - affected.size;
+  const interp = aspectsInterpretation(score);
+
+  const subcortical = ASPECTS_REGIONS.filter(r => r.group === "subcortical");
+  const cortical    = ASPECTS_REGIONS.filter(r => r.group === "cortical");
+
+  return (
+    <div className="rounded-xl border border-[var(--border)]/60 bg-white/[0.02] p-4">
+
+      {/* Score header */}
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">ASPECTS</p>
+          <p className="mt-0.5 text-4xl font-bold tabular-nums text-[var(--text)]">
+            {score}
+            <span className="ml-1 text-base font-normal text-[var(--muted)]">/ 10</span>
+          </p>
+          <p className="mt-0.5 text-[11px] text-[var(--muted)]">
+            Alberta Stroke Program Early CT Score
+          </p>
+        </div>
+        {/* Arc */}
+        <div className="relative h-14 w-14 shrink-0">
+          <svg viewBox="0 0 56 56" className="h-14 w-14 -rotate-90">
+            <circle cx="28" cy="28" r="22" fill="none" stroke="currentColor" strokeWidth="5" className="text-white/10" />
+            <circle
+              cx="28" cy="28" r="22" fill="none" stroke="currentColor" strokeWidth="5"
+              strokeDasharray={`${(score / 10) * 138} 138`}
+              strokeLinecap="round"
+              className={score >= 8 ? "text-green-400" : score >= 7 ? "text-amber-400" : "text-red-400"}
+              style={{ transition: "stroke-dasharray 0.3s ease" }}
+            />
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--text)]">{score}</span>
+        </div>
+      </div>
+
+      {/* Interpretation badge */}
+      <div className={`mb-4 rounded-lg border px-3 py-1.5 text-xs font-medium ${interp.bg} ${interp.color}`}>
+        {interp.label}
+      </div>
+
+      {/* Formula explanation */}
+      <p className="mb-3 text-[11px] text-[var(--muted)]/70">
+        ASPECTS = 10 − affected regions · click each region below to mark as affected
+      </p>
+
+      {/* Subcortical regions */}
+      <div className="mb-2">
+        <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[var(--muted)]/60">
+          Subcortical (ganglionic level)
+        </p>
+        <div className="grid grid-cols-4 gap-1.5">
+          {subcortical.map(r => (
+            <button
+              key={r.id}
+              title={r.tip}
+              onClick={() => toggle(r.id)}
+              className={`group flex flex-col items-center rounded-lg border py-2 text-center transition ${
+                affected.has(r.id)
+                  ? "border-red-500/50 bg-red-500/15 text-red-300"
+                  : "border-[var(--border)]/60 text-[var(--muted)] hover:border-[var(--border)] hover:bg-white/[0.04]"
+              }`}
+            >
+              <span className="text-sm font-bold leading-none">{r.label}</span>
+              <span className="mt-0.5 text-[9px] leading-tight opacity-60">{r.full}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Cortical regions */}
+      <div>
+        <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[var(--muted)]/60">
+          Cortical MCA territory
+        </p>
+        <div className="grid grid-cols-3 gap-1.5">
+          {/* ganglionic level: M1 M2 M3 */}
+          {cortical.slice(0, 3).map(r => (
+            <button
+              key={r.id}
+              title={r.tip}
+              onClick={() => toggle(r.id)}
+              className={`group flex flex-col items-center rounded-lg border py-2 text-center transition ${
+                affected.has(r.id)
+                  ? "border-red-500/50 bg-red-500/15 text-red-300"
+                  : "border-[var(--border)]/60 text-[var(--muted)] hover:border-[var(--border)] hover:bg-white/[0.04]"
+              }`}
+            >
+              <span className="text-sm font-bold leading-none">{r.label}</span>
+              <span className="mt-0.5 text-[9px] leading-tight opacity-60 px-1">{r.full}</span>
+            </button>
+          ))}
+          {/* supraganglionic: M4 M5 M6 */}
+          {cortical.slice(3).map(r => (
+            <button
+              key={r.id}
+              title={r.tip}
+              onClick={() => toggle(r.id)}
+              className={`group flex flex-col items-center rounded-lg border py-2 text-center transition ${
+                affected.has(r.id)
+                  ? "border-red-500/50 bg-red-500/15 text-red-300"
+                  : "border-[var(--border)]/60 text-[var(--muted)] hover:border-[var(--border)] hover:bg-white/[0.04]"
+              }`}
+            >
+              <span className="text-sm font-bold leading-none">{r.label}</span>
+              <span className="mt-0.5 text-[9px] leading-tight opacity-60 px-1">{r.full}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Affected list */}
+      {affected.size > 0 && (
+        <p className="mt-2 text-[11px] text-red-400">
+          Affected: {Array.from(affected).join(", ")} (−{affected.size})
+        </p>
+      )}
+
+      {/* AI metrics (informational) */}
+      <div className="mt-3 border-t border-[var(--border)]/40 pt-3 flex gap-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]/60">AI confidence</p>
+          <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--text)]">{(confidence * 100).toFixed(1)}%</p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]/60">Lesion area</p>
+          <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--text)]">{maskAreaPct.toFixed(2)}%</p>
+        </div>
+        {affected.size > 0 && (
+          <button
+            onClick={() => setAffected(new Set())}
+            className="ml-auto self-end rounded px-2 py-1 text-[10px] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)]/50 transition"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 type SliceResult = {
   filename: string;
   detected: boolean;
@@ -20,70 +226,6 @@ type SliceResult = {
   original_image: string;
   error?: string;
 };
-
-function AspectScoreBreakdown({ result }: { result: SliceResult }) {
-  const conf = result.confidence;
-  const covPct = result.mask_area_pct;
-  const covComponent = Math.min(covPct / 5.0, 1.0);
-  const confPart = +(conf * 7.0).toFixed(2);
-  const covPart = +(covComponent * 3.0).toFixed(2);
-
-  return (
-    <div className="rounded-xl border border-[var(--border)]/60 bg-white/[0.02] p-4">
-      {/* Score header */}
-      <div className="mb-3 flex items-end justify-between">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Aspect Score</p>
-          <p className="mt-0.5 text-3xl font-bold tabular-nums text-[var(--text)]">
-            {result.aspect_score.toFixed(1)}
-            <span className="ml-1 text-sm font-normal text-[var(--muted)]">/ 10</span>
-          </p>
-        </div>
-        {/* Arc indicator */}
-        <div className="relative h-12 w-12">
-          <svg viewBox="0 0 48 48" className="h-12 w-12 -rotate-90">
-            <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" strokeWidth="4" className="text-white/10" />
-            <circle
-              cx="24" cy="24" r="18" fill="none" stroke="currentColor" strokeWidth="4"
-              strokeDasharray={`${(result.aspect_score / 10) * 113} 113`}
-              strokeLinecap="round"
-              className={result.aspect_score >= 5 ? "text-red-400" : "text-amber-400"}
-            />
-          </svg>
-        </div>
-      </div>
-
-      {/* Calculation breakdown */}
-      <div className="space-y-2 border-t border-[var(--border)]/40 pt-3 font-mono text-[11px]">
-        <p className="text-[var(--muted)]/70">Score = Detection × 7 + Coverage × 3</p>
-
-        <div className="flex items-center gap-2">
-          <span className="w-28 text-[var(--muted)]">Detection</span>
-          <div className="flex-1 overflow-hidden rounded-full bg-white/10">
-            <div className="h-1.5 rounded-full bg-blue-400" style={{ width: `${conf * 100}%` }} />
-          </div>
-          <span className="w-10 text-right text-[var(--text)]">{(conf * 100).toFixed(0)}%</span>
-          <span className="w-16 text-right text-[var(--muted)]">× 7 = {confPart}</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="w-28 text-[var(--muted)]">Coverage</span>
-          <div className="flex-1 overflow-hidden rounded-full bg-white/10">
-            <div className="h-1.5 rounded-full bg-violet-400" style={{ width: `${Math.min(covPct / 5 * 100, 100)}%` }} />
-          </div>
-          <span className="w-10 text-right text-[var(--text)]">{covPct.toFixed(2)}%</span>
-          <span className="w-16 text-right text-[var(--muted)]">× 3 = {covPart}</span>
-        </div>
-
-        <div className="flex justify-end border-t border-[var(--border)]/40 pt-1.5">
-          <span className="text-[var(--text)]">= {result.aspect_score.toFixed(1)} / 10</span>
-        </div>
-
-        <p className="text-[var(--muted)]/50">Coverage saturates at 5% of image area</p>
-      </div>
-    </div>
-  );
-}
 
 function SliceCard({ result, index }: { result: SliceResult; index: number }) {
   const activePreset = PRESETS.find((p) => result.prompt.toLowerCase().includes(p.value)) ?? PRESETS[0];
@@ -119,13 +261,13 @@ function SliceCard({ result, index }: { result: SliceResult; index: number }) {
           <img src={`data:image/png;base64,${result.original_image}`} alt="Original" className="w-full rounded-lg border border-[var(--border)]/60" />
         </div>
         <div>
-          <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--muted)]">Segmentation</p>
+          <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--muted)]">AI Segmentation</p>
           <img src={`data:image/png;base64,${result.overlay_image}`} alt="Overlay" className="w-full rounded-lg border border-[var(--border)]/60" />
         </div>
       </div>
 
-      {/* Aspect score */}
-      <AspectScoreBreakdown result={result} />
+      {/* ASPECTS scorer */}
+      <AspectsScorer confidence={result.confidence} maskAreaPct={result.mask_area_pct} />
     </div>
   );
 }
@@ -144,7 +286,7 @@ export default function BiomedParsePage() {
     const arr = Array.from(incoming);
     setResults([]); setError(null);
     setFiles(prev => {
-      const merged = [...prev, ...arr].slice(0, 12); // max 12 slices
+      const merged = [...prev, ...arr].slice(0, 12);
       setPreviews(merged.map(f => f.name.toLowerCase().endsWith(".dcm") ? null : URL.createObjectURL(f)));
       return merged;
     });
@@ -180,7 +322,6 @@ export default function BiomedParsePage() {
     if (!files.length) return;
     setLoading(true); setError(null); setResults([]);
     try {
-      // Analyse all slices in parallel
       const all = await Promise.all(files.map(analyseOne));
       setResults(all);
     } catch (err: unknown) {
@@ -200,7 +341,9 @@ export default function BiomedParsePage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-[var(--text)]">CT Scan Analysis</h1>
-          <p className="mt-0.5 text-sm text-[var(--muted)]">Fine-tuned BiomedParse v2 · stroke detection &amp; segmentation · up to 12 slices</p>
+          <p className="mt-0.5 text-sm text-[var(--muted)]">
+            BiomedParse segmentation · interactive ASPECTS scoring · up to 12 slices
+          </p>
         </div>
         <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-300">
           Research only
@@ -209,8 +352,6 @@ export default function BiomedParsePage() {
 
       {/* Controls row */}
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end">
-
-        {/* Drop zone */}
         <div
           role="button"
           tabIndex={0}
@@ -239,7 +380,6 @@ export default function BiomedParsePage() {
           />
         </div>
 
-        {/* Right controls */}
         <div className="flex flex-col gap-2 sm:w-52">
           <div className="flex gap-2">
             {PRESETS.map((p) => (
@@ -293,7 +433,7 @@ export default function BiomedParsePage() {
         <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
       )}
 
-      {/* Summary banner when multiple results */}
+      {/* Summary banner */}
       {results.length > 1 && (
         <div className={`mb-5 flex items-center gap-3 rounded-xl border px-4 py-3 ${
           detectedCount > 0 ? "border-red-500/30 bg-red-500/5" : "border-green-500/30 bg-green-500/5"
@@ -306,8 +446,8 @@ export default function BiomedParsePage() {
                 : `No ${activePreset.short.toLowerCase()} detected across all ${results.length} slices`}
             </p>
             <p className="text-xs text-[var(--muted)]">
-              Avg. confidence {(results.reduce((s, r) => s + r.confidence, 0) / results.length * 100).toFixed(1)}% ·
-              Avg. aspect score {(results.reduce((s, r) => s + r.aspect_score, 0) / results.length).toFixed(1)}/10
+              Avg. AI confidence {(results.reduce((s, r) => s + r.confidence, 0) / results.length * 100).toFixed(1)}% ·
+              Mark affected regions per slice to calculate ASPECTS
             </p>
           </div>
         </div>
@@ -323,7 +463,7 @@ export default function BiomedParsePage() {
       {results.length === 0 && files.length === 0 && (
         <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border)] text-center">
           <p className="text-sm text-[var(--muted)]">Upload one or more CT slices to begin</p>
-          <p className="text-xs text-[var(--muted)]/50">Each slice is analysed independently in parallel</p>
+          <p className="text-xs text-[var(--muted)]/50">AI segments the lesion · you mark the affected ASPECTS regions</p>
         </div>
       )}
 
