@@ -96,8 +96,84 @@ export default async function Page() {
         </div>
       </div>
 
+      {/* ── Desktop download ───────────────────────────────────────────────── */}
+      <div className="mt-8 rounded-2xl border border-[var(--border)]/80 bg-[var(--panel)]/60 p-6">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Run locally</p>
+            <p className="mt-1 text-base font-semibold text-[var(--text)]">Download the desktop app</p>
+            <p className="mt-0.5 text-sm text-[var(--muted)]">
+              Full offline mode — all inference runs on your own machine. No account needed.
+            </p>
+          </div>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-white/10">
+            <svg className="h-5 w-5 text-[var(--text)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {/* macOS Apple Silicon */}
+          <a
+            href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-mac-arm64.dmg"
+            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
+          >
+            <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[var(--text)]">macOS — Apple Silicon</p>
+              <p className="text-xs text-[var(--muted)]">M1 / M2 / M3 · .dmg</p>
+            </div>
+            <svg className="h-4 w-4 shrink-0 text-[var(--muted)] transition group-hover:translate-y-0.5 group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </a>
+
+          {/* macOS Intel */}
+          <a
+            href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-mac-x64.dmg"
+            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
+          >
+            <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[var(--text)]">macOS — Intel</p>
+              <p className="text-xs text-[var(--muted)]">x86_64 · .dmg</p>
+            </div>
+            <svg className="h-4 w-4 shrink-0 text-[var(--muted)] transition group-hover:translate-y-0.5 group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </a>
+
+          {/* Windows */}
+          <a
+            href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-win-x64-setup.exe"
+            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
+          >
+            <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 12V6.75l6-1.32v6.57H3zm17 0V5.25L10 3v9h10zm0 .75V18.75L10 21v-9h10zM3 18.75v-6H9v6.42l-6-1.32z"/>
+            </svg>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[var(--text)]">Windows</p>
+              <p className="text-xs text-[var(--muted)]">Windows 10/11 64-bit · .exe</p>
+            </div>
+            <svg className="h-4 w-4 shrink-0 text-[var(--muted)] transition group-hover:translate-y-0.5 group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </a>
+        </div>
+
+        <p className="mt-3 text-[11px] text-[var(--muted)]/50">
+          GPU with ≥ 8 GB VRAM recommended · macOS 13+ or Windows 10+
+        </p>
+      </div>
+
       {/* ── Disclaimer ─────────────────────────────────────────────────────── */}
-      <p className="mt-10 text-[11px] leading-relaxed text-[var(--muted)]/50">
+      <p className="mt-8 text-[11px] leading-relaxed text-[var(--muted)]/50">
         Research prototype by Artun Gunturkun &mdash; Henry M. Gunn High School, Palo Alto.
         Not intended for clinical diagnosis or treatment. Always consult a qualified physician.
       </p>

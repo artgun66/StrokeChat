@@ -1,15 +1,15 @@
-# Phase 5 — per-OS desktop installer build (Tauri 2). Each runner stages its own platform's
-# Python freezes + llama-server + Node binary (not cross-buildable) and builds an installer.
-# Signing is gated on secrets; without them, unsigned artifacts are produced.
 name: desktop-build
 
 on:
   workflow_dispatch:
     inputs:
       skip_models:
-        description: "Skip the multi-GB model download"
+        description: "Skip multi-GB model download"
         type: boolean
         default: true
+  push:
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -17,15 +17,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-14       # Apple Silicon
-            osdir: darwin-arm64
-          - os: macos-13       # Intel
-            osdir: darwin-x64
+          - os: macos-14
+            platform: mac-arm64
+            artifact_glob: "**/*.dmg"
+          - os: macos-13
+            platform: mac-x64
+            artifact_glob: "**/*.dmg"
           - os: windows-latest
-            osdir: win-x64
-          - os: ubuntu-22.04
-            osdir: linux-x64
+            platform: win-x64
+            artifact_glob: "**/*-setup.exe"
+
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -37,19 +40,12 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
 
-      - name: Linux system deps for Tauri
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
       - name: Provision llama-server binary
         shell: bash
         run: |
-          mkdir -p desktop/staged/bin/${{ matrix.osdir }}
-          # TODO: download the matching llama.cpp release for ${{ matrix.osdir }} into that dir.
+          mkdir -p desktop/staged/bin/${{ matrix.platform }}
 
-      - name: Stage resources (Python freezes, frontend, model, binaries)
+      - name: Stage resources
         shell: bash
         env:
           SKIP_MODELS: ${{ inputs.skip_models && '1' || '0' }}
@@ -58,23 +54,58 @@ jobs:
       - name: Build installer (Tauri)
         shell: bash
         env:
-          # macOS signing/notarization (empty ⇒ unsigned dev build).
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Windows Authenticode.
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.WINDOWS_CERTIFICATE }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: cd desktop && npm install && npm run build
 
+      # Rename to fixed platform filenames (no version in name so /releases/latest/download/ links never break)
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          if [[ "${{ matrix.platform }}" == win-* ]]; then
+            find desktop/src-tauri/target/release/bundle -name "*-setup.exe" \
+              -exec cp {} "StrokeAssistant-${{ matrix.platform }}-setup.exe" \;
+          else
+            find desktop/src-tauri/target/release/bundle -name "*.dmg" \
+              -exec cp {} "StrokeAssistant-${{ matrix.platform }}.dmg" \;
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
-          name: local-llm-${{ matrix.osdir }}
+          name: installer-${{ matrix.platform }}
           path: |
-            desktop/src-tauri/target/release/bundle/**/*.dmg
-            desktop/src-tauri/target/release/bundle/**/*.exe
-            desktop/src-tauri/target/release/bundle/**/*.AppImage
-            desktop/src-tauri/target/release/bundle/**/*.deb
-          if-no-files-found: ignore
+            StrokeAssistant-${{ matrix.platform }}.dmg
+            StrokeAssistant-${{ matrix.platform }}-setup.exe
+          if-no-files-found: warn
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installer-*
+          merge-multiple: true
+          path: dist/
+
+      - name: List built installers
+        run: ls -lh dist/
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Latest build' }}
+          draft: false
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+          files: dist/*
+          generate_release_notes: true
