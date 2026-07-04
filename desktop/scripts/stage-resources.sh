@@ -17,10 +17,11 @@ ROOT="$(cd "$DESKTOP/.." && pwd)"
 STAGED="$DESKTOP/staged"
 
 case "$(uname -s)-$(uname -m)" in
-  Darwin-arm64) OSDIR=darwin-arm64 ;;
+  Darwin-arm64)  OSDIR=darwin-arm64 ;;
   Darwin-x86_64) OSDIR=darwin-x64 ;;
-  Linux-x86_64) OSDIR=linux-x64 ;;
-  *) echo "unsupported platform $(uname -s)-$(uname -m); set OSDIR manually" >&2; OSDIR=${OSDIR:-} ;;
+  Linux-x86_64)  OSDIR=linux-x64 ;;
+  MINGW*|MSYS*|CYGWIN*) OSDIR=win-x64 ;;
+  *) echo "unsupported platform $(uname -s)-$(uname -m); set OSDIR manually" >&2; OSDIR=${OSDIR:-win-x64} ;;
 esac
 
 echo "==> staging into $STAGED (os=$OSDIR)"
@@ -30,7 +31,7 @@ mkdir -p "$STAGED"/{backend,biomedparse_service,frontend,bin/$OSDIR,models}
 # 1. Backend source (no venv / caches / local data).
 echo "==> backend source"
 rsync -a --delete \
-  --exclude '.venv' --exclude '__pycache__' --exclude 'data' --exclude '*.sqlite3' \
+  --exclude '.venv' --exclude '__pycache__' --exclude '/data' --exclude '*.sqlite3' \
   "$ROOT/backend/" "$STAGED/backend/"
 
 # 2. BiomedParse service + model code + fine-tuned checkpoint.
@@ -50,20 +51,44 @@ SA="$ROOT/frontend/apps/product/.next/standalone"
 # Standalone assembly: colocate static assets next to server.js.
 cp -R "$ROOT/frontend/apps/product/.next/static" "$SA/apps/product/.next/static"
 [ -d "$ROOT/frontend/apps/product/public" ] && cp -R "$ROOT/frontend/apps/product/public" "$SA/apps/product/public" || true
-rsync -a --delete "$SA/" "$STAGED/frontend/"
+# Copy standalone tree preserving symlinks (pnpm symlinks must survive intact).
+# ditto (macOS) and cp -a (Linux/Windows) both preserve symlinks; rsync silently drops them.
+rm -rf "$STAGED/frontend"
+if command -v ditto &>/dev/null; then
+  ditto "$SA" "$STAGED/frontend"
+else
+  cp -a "$SA" "$STAGED/frontend"
+fi
 
-# 4. Binaries for this OS: llama-server + a Node runtime for the standalone server.
-echo "==> binaries (llama-server + node)"
-if command -v llama-server >/dev/null 2>&1; then
-  cp "$(command -v llama-server)" "$STAGED/bin/$OSDIR/"
+# 4. Binaries for this OS — MUST be self-contained (Homebrew builds link /opt/homebrew
+#    dylibs that don't exist on a clean machine; that breaks node AND llama-server there).
+echo "==> binaries (self-contained llama-server + node)"
+TMPBIN="$(mktemp -d)"
+# 4a. llama.cpp release (binary + its @loader_path dylibs).
+if [[ "$OSDIR" == darwin-* ]]; then
+  LLAMA_TAG="${LLAMA_TAG:-$(gh release view --repo ggml-org/llama.cpp --json tagName --jq .tagName 2>/dev/null || echo b9835)}"
+  gh release download "$LLAMA_TAG" --repo ggml-org/llama.cpp --pattern '*macos-arm64*' --dir "$TMPBIN" --clobber 2>/dev/null || \
+    curl -sL -o "$TMPBIN/llama.tgz" "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_TAG/llama-$LLAMA_TAG-bin-macos-arm64.tar.gz"
+  tar -xzf "$TMPBIN"/*.t*gz -C "$TMPBIN"
+  LLDIR="$(dirname "$(find "$TMPBIN" -name llama-server -type f | head -1)")"
+  cp "$LLDIR/llama-server" "$LLDIR"/*.dylib "$STAGED/bin/$OSDIR/"
 else
-  echo "!! llama-server not on PATH — download the matching llama.cpp release into $STAGED/bin/$OSDIR/" >&2
+  echo "!! non-macOS: download the matching llama.cpp release into $STAGED/bin/$OSDIR/" >&2
 fi
-if command -v node >/dev/null 2>&1; then
-  cp "$(command -v node)" "$STAGED/bin/$OSDIR/node"
+# 4b. Official Node.js (self-contained; do NOT use Homebrew's node).
+NODE_VER="${NODE_VER:-$(curl -s https://nodejs.org/dist/index.json | grep -oE '"version":"v22[^"]*"' | head -1 | sed 's/.*"v/v/;s/"//')}"
+case "$OSDIR" in darwin-arm64) NARCH=darwin-arm64;; darwin-x64) NARCH=darwin-x64;; linux-x64) NARCH=linux-x64;; win-x64) NARCH=win-x64;; esac
+if [[ "$OSDIR" == win-* ]]; then
+  curl -sL "https://nodejs.org/dist/$NODE_VER/node-$NODE_VER-$NARCH.zip" -o "$TMPBIN/node.zip"
+  unzip -q "$TMPBIN/node.zip" -d "$TMPBIN"
+  cp "$TMPBIN/node-$NODE_VER-$NARCH/node.exe" "$STAGED/bin/$OSDIR/node.exe"
 else
-  echo "!! node not found — stage a Node 20+ binary into $STAGED/bin/$OSDIR/node" >&2
+  curl -sL "https://nodejs.org/dist/$NODE_VER/node-$NODE_VER-$NARCH.tar.gz" -o "$TMPBIN/node.tgz"
+  tar -xzf "$TMPBIN/node.tgz" -C "$TMPBIN"
+  cp "$TMPBIN/node-$NODE_VER-$NARCH/bin/node" "$STAGED/bin/$OSDIR/node"
 fi
+chmod 755 "$STAGED/bin/$OSDIR/"* 2>/dev/null || true
+rm -rf "$TMPBIN"
 
 # 5. Relocatable CPython runtimes + deps (the freeze).
 #    Uses python-build-standalone via `uv`; standalone interpreters are relocatable, so we
