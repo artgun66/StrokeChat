@@ -118,6 +118,7 @@ export default async function Page() {
           {/* macOS Apple Silicon */}
           <a
             href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-mac-arm64.dmg"
+            download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
             <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
@@ -135,6 +136,7 @@ export default async function Page() {
           {/* macOS Intel */}
           <a
             href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-mac-x64.dmg"
+            download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
             <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
@@ -152,6 +154,7 @@ export default async function Page() {
           {/* Windows */}
           <a
             href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-win-x64-setup.exe"
+            download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
             <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
@@ -167,7 +170,17 @@ export default async function Page() {
           </a>
         </div>
 
-        <p className="mt-3 text-[11px] text-[var(--muted)]/50">
+        <div className="mt-3 flex items-center gap-2">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
+          <p className="text-[11px] text-[var(--muted)]/70">
+            First build in progress — downloads will be ready shortly.
+            <a href="https://github.com/artgun66/LLM-App/releases" target="_blank" rel="noopener noreferrer"
+              className="ml-1 text-[var(--accent)] hover:underline">
+              Check GitHub Releases
+            </a>
+          </p>
+        </div>
+        <p className="mt-1 text-[11px] text-[var(--muted)]/50">
           GPU with ≥ 8 GB VRAM recommended · macOS 13+ or Windows 10+
         </p>
       </div>
