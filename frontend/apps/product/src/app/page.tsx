@@ -47,7 +47,7 @@ export default async function Page() {
       <div className="mb-8 flex items-center gap-2">
         <span className={`h-2 w-2 rounded-full ${status.ok ? "bg-emerald-400 shadow-[0_0_8px_#34d399]" : "bg-amber-400"}`} />
         <span className="text-xs text-[var(--muted)]">
-          {status.ok ? "Assistant online" : "Assistant offline — start the backend to use"}
+          {status.ok ? "Assistant online" : "Assistant offline"}
         </span>
       </div>
 
