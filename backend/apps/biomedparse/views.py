@@ -9,7 +9,12 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 BIOMEDPARSE_SERVICE = os.environ.get("BIOMEDPARSE_SERVICE_URL", "http://127.0.0.1:8001")
-USE_MODAL = bool(os.environ.get("MODAL_TOKEN_ID"))
+MODAL_BIOMEDPARSE_URL = os.environ.get(
+    "MODAL_BIOMEDPARSE_URL",
+    "https://gunturkunartun--biomedparse-segment.modal.run",
+)
+# Use Modal when the URL is set, or when MODAL_TOKEN_ID is present (cloud env).
+USE_MODAL = bool(os.environ.get("MODAL_BIOMEDPARSE_URL") or os.environ.get("MODAL_TOKEN_ID") or os.environ.get("RENDER"))
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -26,15 +31,11 @@ class SegmentView(View):
 
     def _segment_modal(self, image_bytes: bytes, prompt: str):
         import base64
-        endpoint = os.environ.get(
-            "MODAL_BIOMEDPARSE_URL",
-            "https://gunturkunartun--biomedparse-segment.modal.run",
-        )
         try:
             resp = httpx.post(
-                endpoint,
+                MODAL_BIOMEDPARSE_URL,
                 json={"image_b64": base64.b64encode(image_bytes).decode(), "prompt": prompt},
-                timeout=30.0,
+                timeout=180.0,
             )
             resp.raise_for_status()
             return JsonResponse(resp.json())
