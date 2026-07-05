@@ -64,8 +64,7 @@ export default async function Page() {
         </h1>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--muted)]">
           Ask questions about stroke in plain language, or upload a CT scan for AI-powered
-          detection and segmentation of hemorrhagic and ischemic lesions — all running
-          locally on your device.
+          detection and segmentation of hemorrhagic and ischemic lesions.
         </p>
       </div>
 
@@ -103,7 +102,7 @@ export default async function Page() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Run locally</p>
             <p className="mt-1 text-base font-semibold text-[var(--text)]">Download the desktop app</p>
             <p className="mt-0.5 text-sm text-[var(--muted)]">
-              Full offline mode — all inference runs on your own machine. No account needed.
+              Run NeuroChat fully offline — all inference on your own hardware, no account needed.
             </p>
           </div>
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-white/10">

@@ -25,7 +25,7 @@ echo "  [$LABEL] installing deps into the runtime"
 # Avoids the PEP 668 "externally-managed-environment" error that occurs when calling
 # `python -m pip` on a uv-managed standalone (it treats itself as managed by uv).
 if [[ -f "$PROJECT_DIR/requirements.txt" ]]; then
-  uv pip install --python "$PYBIN" --system -r "$PROJECT_DIR/requirements.txt"
+  uv pip install --python "$PYBIN" --system --break-system-packages -r "$PROJECT_DIR/requirements.txt"
   if [[ "$LABEL" == "biomed" ]]; then
     SHIM_SRC="${DETECTRON2_SHIM_SRC:-$PROJECT_DIR/detectron2_shim}"
     SITE="$("$PYBIN" -c 'import site,sys; print(site.getsitepackages()[0])')"
@@ -38,7 +38,7 @@ if [[ -f "$PROJECT_DIR/requirements.txt" ]]; then
   fi
 else
   ( cd "$PROJECT_DIR" && uv pip compile pyproject.toml -o /tmp/$LABEL-reqs.txt )
-  uv pip install --python "$PYBIN" --system -r /tmp/$LABEL-reqs.txt
+  uv pip install --python "$PYBIN" --system --break-system-packages -r /tmp/$LABEL-reqs.txt
 fi
 
 echo "  [$LABEL] copying runtime -> $OUT"

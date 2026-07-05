@@ -57,7 +57,7 @@ export default function RootLayout({
               className="hidden text-right text-[11px] text-[var(--muted)] md:block"
               aria-hidden
             >
-              On-prem
+              Research prototype
             </div>
           </header>
           <div className="min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-[var(--bg)]/0 to-[#070a0e]/30">
