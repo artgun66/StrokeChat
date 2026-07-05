@@ -51,7 +51,9 @@ image = (
     volumes={"/weights": weights_vol},
     timeout=30,
     memory=16384,
-    min_containers=0,
+    min_containers=1,
+    max_containers=12,
+    scaledown_window=30,
 )
 @modal.fastapi_endpoint(method="POST")
 def segment(item: dict):

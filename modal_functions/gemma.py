@@ -66,6 +66,9 @@ def _load_model():
     timeout=300,
     memory=32768,
     secrets=[modal.Secret.from_name("hf-secret")],
+    min_containers=1,
+    max_containers=12,
+    scaledown_window=30,
 )
 def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str]:
     """Stream Gemma response tokens. Each yielded string is an OpenAI-format SSE JSON chunk."""

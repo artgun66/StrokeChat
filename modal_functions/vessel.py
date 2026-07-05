@@ -41,7 +41,9 @@ image = (
     volumes={"/nnUNet_weights": weights_vol},
     timeout=600,
     memory=16384,
-    min_containers=0,
+    min_containers=1,
+    max_containers=12,
+    scaledown_window=30,
 )
 def segment(nifti_bytes: bytes, filename: str) -> str:
     import base64, io, os, tempfile, uuid
@@ -142,7 +144,7 @@ def segment(nifti_bytes: bytes, filename: str) -> str:
 
 # HTTP endpoint — browser uploads directly here, bypassing Render's ~30MB body limit.
 # Async job pattern: POST /segment → {call_id}, GET /result/{call_id} → poll for result.
-@app.function(image=image, memory=2048, timeout=30)
+@app.function(image=image, memory=2048, timeout=300)
 @modal.asgi_app()
 def vessel_api():
     from fastapi import FastAPI, File, UploadFile, HTTPException
