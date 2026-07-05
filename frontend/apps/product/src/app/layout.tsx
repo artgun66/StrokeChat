@@ -11,9 +11,9 @@ const fontSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Local LLM — private inference, your hardware",
+  title: "NeuroChat — AI-powered stroke analysis",
   description:
-    "Run open-weight models on infrastructure you control. Chat, download, and keep data on your side of the firewall.",
+    "Ask questions about stroke and analyse CT scans with AI-powered segmentation. Research tool for stroke education and detection.",
 };
 
 export default function RootLayout({
@@ -37,10 +37,10 @@ export default function RootLayout({
                 />
                 <div className="min-w-0">
                   <div className="text-[15px] font-semibold tracking-tight text-[var(--text)]">
-                    Local LLM
+                    NeuroChat
                   </div>
                   <p className="hidden text-[11px] leading-tight text-[var(--muted)] sm:block sm:max-w-[220px]">
-                    Same room as your data — no detours through someone else’s cloud.
+                    AI-powered stroke analysis &amp; CT segmentation
                   </p>
                 </div>
               </div>

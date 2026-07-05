@@ -54,7 +54,7 @@ export default async function Page() {
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
       <div className="mb-10">
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
-          Stroke Assistant
+          NeuroChat
         </p>
         <h1 className="mt-2 text-4xl font-bold tracking-tight text-[var(--text)] md:text-5xl">
           Your guide to{" "}
@@ -117,7 +117,7 @@ export default async function Page() {
         <div className="flex flex-col gap-3 sm:flex-row">
           {/* macOS Apple Silicon */}
           <a
-            href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-mac-arm64.dmg"
+            href="https://github.com/artgun66/NeuroChat/releases/latest/download/NeuroChat-mac-arm64.dmg"
             download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
@@ -135,7 +135,7 @@ export default async function Page() {
 
           {/* macOS Intel */}
           <a
-            href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-mac-x64.dmg"
+            href="https://github.com/artgun66/NeuroChat/releases/latest/download/NeuroChat-mac-x64.dmg"
             download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
@@ -153,7 +153,7 @@ export default async function Page() {
 
           {/* Windows */}
           <a
-            href="https://github.com/artgun66/LLM-App/releases/latest/download/StrokeAssistant-win-x64-setup.exe"
+            href="https://github.com/artgun66/NeuroChat/releases/latest/download/NeuroChat-win-x64-setup.exe"
             download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
@@ -174,7 +174,7 @@ export default async function Page() {
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
           <p className="text-[11px] text-[var(--muted)]/70">
             First build in progress — downloads will be ready shortly.
-            <a href="https://github.com/artgun66/LLM-App/releases" target="_blank" rel="noopener noreferrer"
+            <a href="https://github.com/artgun66/NeuroChat/releases" target="_blank" rel="noopener noreferrer"
               className="ml-1 text-[var(--accent)] hover:underline">
               Check GitHub Releases
             </a>
