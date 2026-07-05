@@ -69,6 +69,9 @@ CORS_ALLOWED_ORIGINS = env.list(
     default=["http://localhost:3000", "http://127.0.0.1:3000"],
 )
 
+from corsheaders.defaults import default_headers  # noqa: E402
+CORS_ALLOW_HEADERS = list(default_headers) + ["x-session-key"]
+
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
