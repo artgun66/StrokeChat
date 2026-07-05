@@ -30,18 +30,24 @@ mkdir -p "$STAGED"/{backend,biomedparse_service,frontend,bin/$OSDIR,models}
 
 # 1. Backend source (no venv / caches / local data).
 echo "==> backend source"
-rsync -a --delete \
-  --exclude '.venv' --exclude '__pycache__' --exclude '/data' --exclude '*.sqlite3' \
-  "$ROOT/backend/" "$STAGED/backend/"
+rm -rf "$STAGED/backend"
+cp -R "$ROOT/backend" "$STAGED/backend"
+rm -rf "$STAGED/backend/.venv" "$STAGED/backend/data"
+find "$STAGED/backend" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+find "$STAGED/backend" -name "*.sqlite3" -delete 2>/dev/null || true
 
 # 2. BiomedParse service + model code + fine-tuned checkpoint.
 echo "==> biomedparse service + artun_model"
-rsync -a --exclude '.venv' --exclude '__pycache__' \
-  "$ROOT/biomedparse_service/" "$STAGED/biomedparse_service/"
+rm -rf "$STAGED/biomedparse_service"
+cp -R "$ROOT/biomedparse_service" "$STAGED/biomedparse_service"
+rm -rf "$STAGED/biomedparse_service/.venv"
+find "$STAGED/biomedparse_service" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 mkdir -p "$STAGED/artun_model"
-# Ship the model code + the fine-tuned checkpoint the service loads (see app.py paths).
-rsync -a "$ROOT/artun_model/" "$STAGED/artun_model/" || \
+if [[ -d "$ROOT/artun_model" ]]; then
+  cp -R "$ROOT/artun_model/." "$STAGED/artun_model/"
+else
   echo "!! artun_model not found — BiomedParse will be unavailable in the build"
+fi
 
 # 3. Frontend — Next.js standalone server (the supervisor runs `node server.js`).
 #    NEXT_PUBLIC_API_URL is baked to the fixed backend port; the browser calls it via CORS.
