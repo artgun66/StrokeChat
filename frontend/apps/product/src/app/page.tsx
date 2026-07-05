@@ -187,7 +187,7 @@ export default async function Page() {
 
       {/* ── Disclaimer ─────────────────────────────────────────────────────── */}
       <p className="mt-8 text-[11px] leading-relaxed text-[var(--muted)]/50">
-        Research prototype by Artun Gunturkun &mdash; Henry M. Gunn High School, Palo Alto.
+        NeuroChat &mdash; research prototype by Artun Gunturkun, Henry M. Gunn High School, Palo Alto.
         Not intended for clinical diagnosis or treatment. Always consult a qualified physician.
       </p>
 

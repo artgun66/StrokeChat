@@ -477,7 +477,7 @@ export default function BiomedParsePage() {
       )}
 
       <p className="mt-6 text-[11px] text-[var(--muted)]/50">
-        Research prototype · not for clinical diagnosis or treatment.
+        NeuroChat · research prototype · not for clinical diagnosis or treatment.
       </p>
     </main>
   );
