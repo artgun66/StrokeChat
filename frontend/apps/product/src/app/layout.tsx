@@ -11,7 +11,7 @@ const fontSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "NeuroChat — AI-powered stroke analysis",
+  title: "StrokeChat — AI-powered stroke analysis",
   description:
     "Ask questions about stroke and analyse CT scans with AI-powered segmentation. Research tool for stroke education and detection.",
 };
@@ -37,7 +37,7 @@ export default function RootLayout({
                 />
                 <div className="min-w-0">
                   <div className="text-[15px] font-semibold tracking-tight text-[var(--text)]">
-                    NeuroChat
+                    StrokeChat
                   </div>
                   <p className="hidden text-[11px] leading-tight text-[var(--muted)] sm:block sm:max-w-[220px]">
                     AI-powered stroke analysis &amp; CT segmentation

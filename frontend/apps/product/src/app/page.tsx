@@ -54,7 +54,7 @@ export default async function Page() {
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
       <div className="mb-10">
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
-          NeuroChat
+          StrokeChat
         </p>
         <h1 className="mt-2 text-4xl font-bold tracking-tight text-[var(--text)] md:text-5xl">
           Your guide to{" "}
@@ -102,7 +102,7 @@ export default async function Page() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Run locally</p>
             <p className="mt-1 text-base font-semibold text-[var(--text)]">Download the desktop app</p>
             <p className="mt-0.5 text-sm text-[var(--muted)]">
-              Run NeuroChat fully offline — all inference on your own hardware, no account needed.
+              Run StrokeChat fully offline — all inference on your own hardware, no account needed.
             </p>
           </div>
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-white/10">
@@ -116,7 +116,7 @@ export default async function Page() {
         <div className="flex flex-col gap-3 sm:flex-row">
           {/* macOS Apple Silicon */}
           <a
-            href="https://github.com/artgun66/NeuroChat/releases/latest/download/NeuroChat-mac-arm64.dmg"
+            href="https://github.com/artgun66/StrokeChat/releases/latest/download/StrokeChat-mac-arm64.dmg"
             download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
@@ -134,7 +134,7 @@ export default async function Page() {
 
           {/* macOS Intel */}
           <a
-            href="https://github.com/artgun66/NeuroChat/releases/latest/download/NeuroChat-mac-x64.dmg"
+            href="https://github.com/artgun66/StrokeChat/releases/latest/download/StrokeChat-mac-x64.dmg"
             download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
@@ -152,7 +152,7 @@ export default async function Page() {
 
           {/* Windows */}
           <a
-            href="https://github.com/artgun66/NeuroChat/releases/latest/download/NeuroChat-win-x64-setup.exe"
+            href="https://github.com/artgun66/StrokeChat/releases/latest/download/StrokeChat-win-x64-setup.exe"
             download
             className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
           >
@@ -173,7 +173,7 @@ export default async function Page() {
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
           <p className="text-[11px] text-[var(--muted)]/70">
             First build in progress — downloads will be ready shortly.
-            <a href="https://github.com/artgun66/NeuroChat/releases" target="_blank" rel="noopener noreferrer"
+            <a href="https://github.com/artgun66/StrokeChat/releases" target="_blank" rel="noopener noreferrer"
               className="ml-1 text-[var(--accent)] hover:underline">
               Check GitHub Releases
             </a>
@@ -186,7 +186,7 @@ export default async function Page() {
 
       {/* ── Disclaimer ─────────────────────────────────────────────────────── */}
       <p className="mt-8 text-[11px] leading-relaxed text-[var(--muted)]/50">
-        NeuroChat &mdash; research prototype by Artun Gunturkun, Henry M. Gunn High School, Palo Alto.
+        StrokeChat &mdash; research prototype by Artun Gunturkun, Henry M. Gunn High School, Palo Alto.
         Not intended for clinical diagnosis or treatment. Always consult a qualified physician.
       </p>
 

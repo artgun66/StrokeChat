@@ -355,7 +355,7 @@ export function ChatPane({
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {messages.length === 0 ? (
           <div className="mx-auto mt-12 max-w-md rounded-2xl border border-[var(--border)]/90 bg-gradient-to-b from-[var(--panel-elevated)]/80 to-[var(--panel)]/90 p-8 text-center shadow-lg shadow-black/20">
-            <p className="text-sm font-medium text-[var(--text)]">NeuroChat</p>
+            <p className="text-sm font-medium text-[var(--text)]">StrokeChat</p>
             <p className="mt-2 text-balance text-sm leading-relaxed text-[var(--muted)]">
               Ask anything about stroke, or drop a CT brain scan image to get an
               AI-powered analysis with segmentation overlay. Follow-up questions

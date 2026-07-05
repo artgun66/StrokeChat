@@ -7,7 +7,7 @@ from django.urls import include, path
 def root(_request):
     return JsonResponse(
         {
-            "service": "neurochat-backend",
+            "service": "strokechat-backend",
             "phase": "2-inference-and-chat",
             "status": "ok",
         }
