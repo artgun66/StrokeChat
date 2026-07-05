@@ -73,10 +73,11 @@ export async function* streamChatCompletions(
     thread_id?: string;
     [k: string]: unknown;
   },
+  extraHeaders?: Record<string, string>,
 ): AsyncIterable<ChatChunk | { error: string }> {
   const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
     method: "POST",
-    headers: { "content-type": "application/json", accept: "text/event-stream" },
+    headers: { "content-type": "application/json", accept: "text/event-stream", ...extraHeaders },
     body: JSON.stringify({ ...body, stream: true }),
   });
   if (!res.ok || !res.body) {

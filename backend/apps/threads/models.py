@@ -39,6 +39,7 @@ class Thread(BaseModel):
         related_name="threads",
     )
     parameters = models.JSONField(default=dict, blank=True)
+    session_key = models.UUIDField(db_index=True, null=True, blank=True)
 
     class Meta:
         db_table = "threads_thread"
