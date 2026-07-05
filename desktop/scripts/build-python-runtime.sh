@@ -18,7 +18,12 @@ INSTALL_DIR="$(mktemp -d)/py"
 uv python install "$PYVER" --install-dir "$INSTALL_DIR"
 PYHOME="$(find "$INSTALL_DIR" -maxdepth 1 -type d -name "cpython-${PYVER}*" | head -1)"
 [[ -n "$PYHOME" ]] || { echo "  [$LABEL] could not locate installed cpython"; exit 1; }
-PYBIN="$PYHOME/bin/python3"
+# Windows: binary is python.exe at root; Unix: bin/python3
+if [[ -f "$PYHOME/python.exe" ]]; then
+  PYBIN="$PYHOME/python.exe"
+else
+  PYBIN="$PYHOME/bin/python3"
+fi
 
 echo "  [$LABEL] installing deps into the runtime"
 # Use `uv pip install --python` to install into uv's own standalone interpreter.
@@ -45,4 +50,6 @@ echo "  [$LABEL] copying runtime -> $OUT"
 rm -rf "$OUT"
 cp -R "$PYHOME" "$OUT"
 # Sanity: the bundled interpreter must run standalone.
-"$OUT/bin/python3" --version
+OUT_BIN="$OUT/bin/python3"
+[[ -f "$OUT/python.exe" ]] && OUT_BIN="$OUT/python.exe"
+"$OUT_BIN" --version
