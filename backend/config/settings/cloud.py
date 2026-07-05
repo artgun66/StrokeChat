@@ -6,12 +6,18 @@ DEBUG = False
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "/opt/render/project/src/db.sqlite3",
+_db_url = env.str("DATABASE_URL", default="")
+if _db_url:
+    import dj_database_url
+    DATABASES = {"default": dj_database_url.parse(_db_url, conn_max_age=600)}
+else:
+    # Fallback to SQLite for local testing without a DATABASE_URL set.
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "/opt/render/project/src/db.sqlite3",
+        }
     }
-}
 
 # Static files — WhiteNoise serves them directly from Django on Render
 MIDDLEWARE = [
