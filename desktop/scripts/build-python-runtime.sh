@@ -21,12 +21,11 @@ PYHOME="$(find "$INSTALL_DIR" -maxdepth 1 -type d -name "cpython-${PYVER}*" | he
 PYBIN="$PYHOME/bin/python3"
 
 echo "  [$LABEL] installing deps into the runtime"
+# Use `uv pip install --python` to install into uv's own standalone interpreter.
+# Avoids the PEP 668 "externally-managed-environment" error that occurs when calling
+# `python -m pip` on a uv-managed standalone (it treats itself as managed by uv).
 if [[ -f "$PROJECT_DIR/requirements.txt" ]]; then
-  "$PYBIN" -m pip install --upgrade pip
-  "$PYBIN" -m pip install -r "$PROJECT_DIR/requirements.txt"
-  # BiomedParse needs the pure-Python detectron2 shim (see docs/RUNNING-LOCAL.md) — it is
-  # platform-independent and avoids building detectron2's C++ ops. Stage it from the repo's
-  # reference copy if present; otherwise warn so the build doesn't silently ship broken.
+  uv pip install --python "$PYBIN" --system -r "$PROJECT_DIR/requirements.txt"
   if [[ "$LABEL" == "biomed" ]]; then
     SHIM_SRC="${DETECTRON2_SHIM_SRC:-$PROJECT_DIR/detectron2_shim}"
     SITE="$("$PYBIN" -c 'import site,sys; print(site.getsitepackages()[0])')"
@@ -34,14 +33,12 @@ if [[ -f "$PROJECT_DIR/requirements.txt" ]]; then
       cp -R "$SHIM_SRC" "$SITE/detectron2"
       echo "  [biomed] installed detectron2 pure-Python shim from $SHIM_SRC"
     else
-      echo "  [biomed] WARNING: no detectron2 shim at $SHIM_SRC — segmentation will fail until it is added (docs/RUNNING-LOCAL.md)"
+      echo "  [biomed] WARNING: no detectron2 shim at $SHIM_SRC — segmentation will fail until it is added"
     fi
   fi
 else
-  # Backend: compile pyproject deps to a lockfile then install (mirrors backend/Dockerfile).
   ( cd "$PROJECT_DIR" && uv pip compile pyproject.toml -o /tmp/$LABEL-reqs.txt )
-  "$PYBIN" -m pip install --upgrade pip
-  "$PYBIN" -m pip install -r /tmp/$LABEL-reqs.txt
+  uv pip install --python "$PYBIN" --system -r /tmp/$LABEL-reqs.txt
 fi
 
 echo "  [$LABEL] copying runtime -> $OUT"
