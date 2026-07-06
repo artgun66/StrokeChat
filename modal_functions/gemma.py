@@ -66,7 +66,7 @@ def _load_model():
     timeout=300,
     memory=32768,
     secrets=[modal.Secret.from_name("hf-secret")],
-    min_containers=1,
+    min_containers=0,
     max_containers=12,
     scaledown_window=30,
 )

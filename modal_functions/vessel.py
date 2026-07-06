@@ -41,7 +41,7 @@ image = (
     volumes={"/nnUNet_weights": weights_vol},
     timeout=600,
     memory=16384,
-    min_containers=1,
+    min_containers=0,
     max_containers=12,
     scaledown_window=30,
 )
