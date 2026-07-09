@@ -20,7 +20,7 @@ from apps.inference.backends.base import (
 
 logger = logging.getLogger(__name__)
 
-MODAL_MODEL_SLUG = "gemma-3-27b-it"
+MODAL_MODEL_SLUG = "medgemma-27b-it"
 
 
 class ModalBackend:
@@ -29,7 +29,7 @@ class ModalBackend:
     async def chat_completions(self, req: ChatRequest) -> AsyncIterator[Chunk]:
         import modal
 
-        fn = modal.Function.from_name("gemma", "chat_stream")
+        fn = modal.Function.from_name("medgemma", "chat_stream")
 
         async for token_json in fn.remote_gen.aio(req.messages, req.extra or {}):
             yield Chunk(delta=token_json)
@@ -38,7 +38,7 @@ class ModalBackend:
         return [
             ModelHandle(
                 id=MODAL_MODEL_SLUG,
-                display_name="Gemma 3 27B Instruct (Modal GPU)",
+                display_name="MedGemma 27B Instruct (Modal GPU)",
                 context_length=8192,
             )
         ]
