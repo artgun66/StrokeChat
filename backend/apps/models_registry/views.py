@@ -7,8 +7,8 @@ from apps.models_registry.models import ModelFile
 from apps.models_registry.serializers import ModelFileSerializer
 
 _MODAL_VIRTUAL_MODEL = {
-    "id": "modal-medgemma-27b-it",
-    "catalog_slug": "medgemma-27b-it",
+    "id": "modal-medgemma-4b-it",
+    "catalog_slug": "medgemma-4b-it",
     "local_path": "",
     "sha256": "",
     "size_bytes": 0,

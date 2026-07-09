@@ -20,7 +20,7 @@ from apps.inference.backends.base import (
 
 logger = logging.getLogger(__name__)
 
-MODAL_MODEL_SLUG = "medgemma-27b-it"
+MODAL_MODEL_SLUG = "medgemma-4b-it"
 
 
 class ModalBackend:
@@ -38,7 +38,7 @@ class ModalBackend:
         return [
             ModelHandle(
                 id=MODAL_MODEL_SLUG,
-                display_name="MedGemma 27B Instruct (Modal GPU)",
+                display_name="MedGemma 4B Instruct — vision+text (Modal GPU)",
                 context_length=8192,
             )
         ]

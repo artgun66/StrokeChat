@@ -1,4 +1,7 @@
-"""MedGemma 27B-IT inference on Modal A100 80GB (bfloat16, no quantization).
+"""MedGemma 4B-IT multimodal inference on Modal A10G (bfloat16).
+
+4B is the multimodal variant — accepts both images and text.
+27B is text-only and cannot process images.
 
 Deployed with: modal deploy modal_functions/gemma.py
 Called from Django ModalBackend via modal.Function.from_name().
@@ -10,7 +13,7 @@ import modal
 
 app = modal.App("medgemma")
 
-MODEL_ID = "google/medgemma-27b-it"
+MODEL_ID = "google/medgemma-4b-it"
 CACHE_DIR = "/model-cache"
 
 model_vol = modal.Volume.from_name("medgemma-model-cache", create_if_missing=True)
@@ -19,8 +22,10 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
         "torch==2.6.0",
+        "torchvision",
         "transformers>=4.51.0,<5.0.0",
         "accelerate",
+        "Pillow",
         "sentencepiece",
         "protobuf",
         "huggingface_hub",
@@ -29,21 +34,21 @@ image = (
 
 with image.imports():
     import torch
-    from transformers import AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+    from transformers import AutoProcessor, AutoModelForImageTextToText, TextIteratorStreamer
 
-_tokenizer = None
+_processor = None
 _model = None
 
 
 def _load_model():
-    global _tokenizer, _model
+    global _processor, _model
     if _model is not None:
         return
     hf_token = os.environ.get("HF_TOKEN")
-    _tokenizer = AutoTokenizer.from_pretrained(
+    _processor = AutoProcessor.from_pretrained(
         MODEL_ID, cache_dir=CACHE_DIR, token=hf_token
     )
-    _model = AutoModelForCausalLM.from_pretrained(
+    _model = AutoModelForImageTextToText.from_pretrained(
         MODEL_ID,
         cache_dir=CACHE_DIR,
         token=hf_token,
@@ -54,42 +59,61 @@ def _load_model():
 
 
 @app.function(
-    gpu="a100-80gb",
+    gpu="A10G",
     image=image,
     volumes={CACHE_DIR: model_vol},
     timeout=300,
-    memory=32768,
+    memory=16384,
     secrets=[modal.Secret.from_name("hf-secret")],
     min_containers=0,
     max_containers=12,
     scaledown_window=30,
 )
 def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str]:
-    """Stream MedGemma response tokens. Each yielded string is an OpenAI-format SSE JSON chunk."""
+    """Stream MedGemma 4B response tokens. Accepts image_url content blocks."""
     import json
     import threading
+    import base64
+    import io
+    import re
+    from PIL import Image as PILImage
 
     _load_model()
 
-    # Flatten any multimodal content blocks to text only (MedGemma 27B is text-only)
-    flat_messages = []
+    processed_messages = []
+    images = []
+
     for msg in messages:
         content = msg["content"]
         if isinstance(content, list):
-            text = " ".join(b["text"] for b in content if b.get("type") == "text")
-            flat_messages.append({"role": msg["role"], "content": text})
+            parts = []
+            for block in content:
+                if block.get("type") == "text":
+                    parts.append(block["text"])
+                elif block.get("type") == "image_url":
+                    url = block["image_url"]["url"]
+                    if url.startswith("data:"):
+                        b64 = re.sub(r"^data:[^;]+;base64,", "", url)
+                        img = PILImage.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
+                        images.append(img)
+                        parts.append("<image>")
+            processed_messages.append({"role": msg["role"], "content": "\n".join(parts)})
         else:
-            flat_messages.append(msg)
+            processed_messages.append(msg)
 
-    chat_text = _tokenizer.apply_chat_template(
-        flat_messages, tokenize=False, add_generation_prompt=True
+    chat_text = _processor.apply_chat_template(
+        processed_messages, tokenize=False, add_generation_prompt=True
     )
-    inputs = _tokenizer(chat_text, return_tensors="pt").to(_model.device)
+
+    if images:
+        inputs = _processor(text=chat_text, images=images, return_tensors="pt").to(_model.device)
+    else:
+        inputs = _processor(text=chat_text, return_tensors="pt").to(_model.device)
 
     max_new_tokens = (extra or {}).get("max_tokens", 1024)
     temperature = (extra or {}).get("temperature", 0.7)
 
-    streamer = TextIteratorStreamer(_tokenizer, skip_prompt=True, skip_special_tokens=True)
+    streamer = TextIteratorStreamer(_processor.tokenizer, skip_prompt=True, skip_special_tokens=True)
 
     thread = threading.Thread(target=_model.generate, kwargs={
         **inputs,
