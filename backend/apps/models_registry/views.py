@@ -25,6 +25,6 @@ class ModelFileListView(generics.ListAPIView):
     serializer_class = ModelFileSerializer
 
     def list(self, request, *args, **kwargs):
-        if os.environ.get("MODAL_TOKEN_ID"):
+        if os.environ.get("MODAL_TOKEN_ID") or os.environ.get("RENDER"):
             return Response({"count": 1, "next": None, "previous": None, "results": [_MODAL_VIRTUAL_MODEL]})
         return super().list(request, *args, **kwargs)

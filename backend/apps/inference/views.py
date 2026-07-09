@@ -50,7 +50,7 @@ async def chat_completions(request: HttpRequest) -> StreamingHttpResponse | Json
     thread_id = payload.get("thread_id")  # our extension (optional)
 
     import os as _os
-    _use_modal = bool(_os.environ.get("MODAL_TOKEN_ID"))
+    _use_modal = bool(_os.environ.get("MODAL_TOKEN_ID") or _os.environ.get("RENDER"))
 
     if not _use_modal:
         @sync_to_async
