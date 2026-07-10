@@ -82,23 +82,25 @@ def _generate_tokens(messages: list[dict], extra: dict | None = None) -> Iterato
     _load_model()
 
     processed_messages = []
-    images = []
+    all_images = []
 
     for msg in messages:
         content = msg["content"]
         if isinstance(content, list):
-            parts = []
+            new_content = []
             for block in content:
                 if block.get("type") == "text":
-                    parts.append(block["text"])
+                    new_content.append({"type": "text", "text": block["text"]})
                 elif block.get("type") == "image_url":
                     url = block["image_url"]["url"]
                     if url.startswith("data:"):
                         b64 = re.sub(r"^data:[^;]+;base64,", "", url)
                         img = PILImage.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
-                        images.append(img)
-                        parts.append("<image>")
-            processed_messages.append({"role": msg["role"], "content": "\n".join(parts)})
+                        all_images.append(img)
+                        # Gemma3 chat template expects {"type": "image"} — no image data here;
+                        # PIL images are passed separately to the processor.
+                        new_content.append({"type": "image"})
+            processed_messages.append({"role": msg["role"], "content": new_content})
         else:
             processed_messages.append(msg)
 
@@ -106,8 +108,8 @@ def _generate_tokens(messages: list[dict], extra: dict | None = None) -> Iterato
         processed_messages, tokenize=False, add_generation_prompt=True
     )
 
-    if images:
-        inputs = _processor(text=chat_text, images=images, return_tensors="pt").to(_model.device)
+    if all_images:
+        inputs = _processor(text=chat_text, images=all_images, return_tensors="pt").to(_model.device)
     else:
         inputs = _processor(text=chat_text, return_tensors="pt").to(_model.device)
 
