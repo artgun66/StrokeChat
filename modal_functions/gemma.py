@@ -4,7 +4,8 @@
 27B is text-only and cannot process images.
 
 Deployed with: modal deploy modal_functions/gemma.py
-Called from Django ModalBackend via modal.Function.from_name().
+Called from Django via HTTP SSE to the public fastapi_endpoint URL.
+No Modal SDK credentials needed on the caller side.
 """
 import os
 from typing import Iterator
@@ -29,6 +30,7 @@ image = (
         "sentencepiece",
         "protobuf",
         "huggingface_hub",
+        "fastapi[standard]",
     )
 )
 
@@ -45,32 +47,31 @@ def _load_model():
     if _model is not None:
         return
     hf_token = os.environ.get("HF_TOKEN")
-    _processor = AutoProcessor.from_pretrained(
-        MODEL_ID, cache_dir=CACHE_DIR, token=hf_token
-    )
-    _model = AutoModelForImageTextToText.from_pretrained(
-        MODEL_ID,
-        cache_dir=CACHE_DIR,
-        token=hf_token,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",
-    )
-    _model.eval()
+    # Try local cache first (model pre-cached in volume); fall back to download.
+    # Newer transformers re-validates gated access even on cache hits, so we
+    # explicitly use local_files_only to skip that network check.
+    for local_only in (True, False):
+        try:
+            _processor = AutoProcessor.from_pretrained(
+                MODEL_ID, cache_dir=CACHE_DIR, token=hf_token, local_files_only=local_only
+            )
+            _model = AutoModelForImageTextToText.from_pretrained(
+                MODEL_ID,
+                cache_dir=CACHE_DIR,
+                token=hf_token,
+                local_files_only=local_only,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+            )
+            _model.eval()
+            return
+        except Exception:
+            if not local_only:
+                raise
 
 
-@app.function(
-    gpu="A10G",
-    image=image,
-    volumes={CACHE_DIR: model_vol},
-    timeout=300,
-    memory=16384,
-    secrets=[modal.Secret.from_name("hf-secret")],
-    min_containers=0,
-    max_containers=12,
-    scaledown_window=30,
-)
-def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str]:
-    """Stream MedGemma 4B response tokens. Accepts image_url content blocks."""
+def _generate_tokens(messages: list[dict], extra: dict | None = None) -> Iterator[str]:
+    """Core inference — yields OpenAI-format JSON chunk strings."""
     import json
     import threading
     import base64
@@ -140,3 +141,30 @@ def chat_stream(messages: list[dict], extra: dict | None = None) -> Iterator[str
         "object": "chat.completion.chunk",
         "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
     })
+
+
+@app.function(
+    gpu="A10G",
+    image=image,
+    volumes={CACHE_DIR: model_vol},
+    timeout=300,
+    memory=16384,
+    secrets=[modal.Secret.from_name("hf-secret")],
+    min_containers=0,
+    max_containers=12,
+    scaledown_window=30,
+)
+@modal.fastapi_endpoint(method="POST")
+def chat_http(item: dict):
+    """Public HTTP SSE endpoint — no Modal credentials needed on the caller side."""
+    from fastapi.responses import StreamingResponse
+
+    messages = item.get("messages", [])
+    extra = item.get("extra") or {}
+
+    def generate():
+        for token_json in _generate_tokens(messages, extra):
+            yield f"data: {token_json}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
