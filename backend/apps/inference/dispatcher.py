@@ -11,7 +11,7 @@ from apps.inference.backends.base import InferenceBackend
 
 
 def get_backend(*, tenant_id: str | None = None) -> InferenceBackend:  # noqa: ARG001
-    if os.environ.get("MODAL_TOKEN_ID"):
+    if os.environ.get("MODAL_TOKEN_ID") or os.environ.get("RENDER"):
         from apps.inference.backends.modal_backend import ModalBackend
         return ModalBackend()
 
