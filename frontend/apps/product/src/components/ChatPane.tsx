@@ -137,6 +137,29 @@ export function ChatPane({
     didInitialScroll.current = true;
   }, [messages]);
 
+  // Auto-send BiomedParse context when navigated from the CT analysis page.
+  const prefillFired = useRef(false);
+  useEffect(() => {
+    if (prefillFired.current || !modelSlug) return;
+    const raw = typeof window !== "undefined"
+      ? sessionStorage.getItem("strokechat_biomedparse_prefill")
+      : null;
+    if (!raw) return;
+    prefillFired.current = true;
+    sessionStorage.removeItem("strokechat_biomedparse_prefill");
+    try {
+      const ctx = JSON.parse(raw) as { message: string; images: Array<{ name: string; dataUrl: string }> };
+      const imgs: ImageAttachment[] = ctx.images.map(img => ({
+        kind: "image" as const,
+        name: img.name,
+        dataUrl: img.dataUrl,
+        size: img.dataUrl.length,
+      }));
+      send(ctx.message, imgs, []);
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelSlug]);
+
   async function send(text: string, images: ImageAttachment[], niftis: NiftiAttachment[]) {
     if ((!text.trim() && images.length === 0 && niftis.length === 0) || busy || !modelSlug) return;
     setError(null);

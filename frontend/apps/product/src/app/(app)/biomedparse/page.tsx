@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "../../../lib/api";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -273,6 +275,7 @@ function SliceCard({ result, index }: { result: SliceResult; index: number }) {
 }
 
 export default function BiomedParsePage() {
+  const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<(string | null)[]>([]);
   const [prompt, setPrompt] = useState("bleeding");
@@ -280,6 +283,7 @@ export default function BiomedParsePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback((incoming: FileList | File[]) => {
@@ -333,6 +337,38 @@ export default function BiomedParsePage() {
 
   const activePreset = PRESETS.find((p) => p.value === prompt) ?? PRESETS[0];
   const detectedCount = results.filter(r => r.detected).length;
+
+  const handleExploreInChat = async () => {
+    if (!results.length || navigating) return;
+    setNavigating(true);
+    try {
+      const label = activePreset.label;
+      const lines = results
+        .filter(r => !r.error)
+        .map((r, i) =>
+          `• Slice ${i + 1} (${r.filename}): ${r.detected ? `⚠ ${activePreset.short} DETECTED` : "✓ Clear"} — confidence ${(r.confidence * 100).toFixed(1)}%, lesion area ${r.mask_area_pct.toFixed(2)}%`
+        );
+      const message =
+        `CT Scan Analysis — ${label} Detection\n\n` +
+        `I ran BiomedParse AI segmentation on ${results.filter(r => !r.error).length} CT brain scan slice(s). Findings:\n\n` +
+        lines.join("\n") +
+        `\n\nThe original CT scan images are attached. Please provide clinical interpretation of these findings.`;
+
+      const images = results
+        .filter(r => !r.error && r.original_image)
+        .slice(0, 4)
+        .map((r, i) => ({
+          name: r.filename || `slice-${i + 1}.png`,
+          dataUrl: `data:image/png;base64,${r.original_image}`,
+        }));
+
+      sessionStorage.setItem("strokechat_biomedparse_prefill", JSON.stringify({ message, images }));
+      const thread = await api.threads.create({ title: `CT Analysis — ${label}` });
+      router.push(`/threads/view?id=${thread.id}`);
+    } catch {
+      setNavigating(false);
+    }
+  };
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
@@ -450,6 +486,27 @@ export default function BiomedParsePage() {
               Mark affected regions per slice to calculate ASPECTS
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Explore in chat CTA */}
+      {results.length > 0 && (
+        <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-[var(--text)]">Explore further with our AI chat models</p>
+            <p className="text-xs text-[var(--muted)]">Send these results and CT images directly to MedGemma for clinical interpretation</p>
+          </div>
+          <button
+            onClick={handleExploreInChat}
+            disabled={navigating}
+            className="flex shrink-0 items-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+          >
+            {navigating ? (
+              <><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> Opening…</>
+            ) : (
+              <>Chat<svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></>
+            )}
+          </button>
         </div>
       )}
 
