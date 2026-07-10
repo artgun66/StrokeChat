@@ -100,6 +100,10 @@ async def chat_completions(request: HttpRequest) -> StreamingHttpResponse | Json
         except LlamaCppError as exc:
             err = json.dumps({"error": str(exc), "code": "engine_error"})
             yield f"data: {err}\n\n".encode()
+        except Exception as exc:
+            logger.exception("chat_completions stream error")
+            err = json.dumps({"error": str(exc), "code": "stream_error"})
+            yield f"data: {err}\n\n".encode()
         finally:
             yield b"data: [DONE]\n\n"
 
