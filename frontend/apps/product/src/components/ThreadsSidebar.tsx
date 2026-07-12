@@ -56,22 +56,29 @@ export function ThreadsSidebar({ activeId }: Props) {
   }
 
   return (
-    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-[var(--border)]/80 bg-gradient-to-b from-[var(--panel-elevated)]/40 to-[var(--panel)]/50">
+    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-[var(--border)]/80 bg-white/65 backdrop-blur-xl">
       <div className="border-b border-[var(--border)]/80 p-3">
-        <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
-          Conversations
-        </p>
+        <div className="mb-3 flex items-center justify-between px-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+            Conversations
+          </p>
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-[var(--muted)]">
+            {threads.length}
+          </span>
+        </div>
         <button
           onClick={newThread}
           disabled={busy}
-          className="w-full rounded-xl bg-gradient-to-b from-[var(--accent)] to-[#2a4160] px-3 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#0d1520]/60 ring-1 ring-white/10 transition hover:brightness-110 disabled:opacity-50"
+          className="w-full rounded-2xl bg-gradient-to-b from-[var(--accent)] to-[#1d4ed8] px-3 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-200 ring-1 ring-blue-300/50 transition hover:-translate-y-0.5 hover:shadow-xl disabled:translate-y-0 disabled:opacity-50"
         >
           {busy ? "Starting…" : "New chat"}
         </button>
       </div>
-      <ul className="flex-1 space-y-1 overflow-y-auto p-2 text-sm">
+      <ul className="flex-1 space-y-1.5 overflow-y-auto p-2 text-sm">
         {threads.length === 0 ? (
-          <li className="px-2 py-3 text-xs text-[var(--muted)]">No threads yet.</li>
+          <li className="rounded-2xl border border-dashed border-[var(--border)] bg-white/50 px-3 py-4 text-xs leading-5 text-[var(--muted)]">
+            No threads yet. Start a new chat to keep your stroke questions and scan context together.
+          </li>
         ) : (
           threads.map((t) => {
             const isActive = t.id === activeId;
@@ -82,10 +89,10 @@ export function ThreadsSidebar({ activeId }: Props) {
                   href={`/threads/view?id=${t.id}`}
                   aria-current={isActive ? "page" : undefined}
                   className={
-                    "block truncate rounded-lg border py-2 pl-3 pr-9 transition " +
+                    "block truncate rounded-2xl border py-2.5 pl-3 pr-9 transition " +
                     (isActive
-                      ? "border-[var(--accent)]/50 bg-[var(--accent-soft)] text-white"
-                      : "border-transparent text-[var(--muted)] hover:border-[var(--border)] hover:bg-white/5 hover:text-white")
+                      ? "border-[var(--accent)]/30 bg-white font-semibold text-[var(--accent)] shadow-sm"
+                      : "border-transparent text-[var(--muted)] hover:border-[var(--border)] hover:bg-white/80 hover:text-[var(--text)]")
                   }
                 >
                   {isDeleting ? "Deleting…" : t.title || "Untitled"}
@@ -102,7 +109,7 @@ export function ThreadsSidebar({ activeId }: Props) {
                   title="Delete thread"
                   className={
                     "absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-[var(--muted)] transition " +
-                    "opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-red-500/15 hover:text-red-300 disabled:opacity-50 " +
+                    "opacity-0 group-hover:opacity-100 focus:opacity-100 hover:bg-red-100 hover:text-red-600 disabled:opacity-50 " +
                     (isActive ? "opacity-60" : "")
                   }
                 >

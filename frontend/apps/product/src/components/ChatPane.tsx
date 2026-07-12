@@ -320,6 +320,24 @@ export function ChatPane({
     if (files.length > 0) inputRef.current?.addFiles(files);
   }
 
+  const emptyPrompts = [
+    "What symptoms suggest hemorrhagic stroke?",
+    "Explain ASPECTS in plain language",
+    "Drop a CT slice for segmentation",
+  ];
+
+  function roleLabel(role: DisplayMessage["role"]) {
+    if (role === "assistant") return "StrokeChat";
+    if (role === "user") return "You";
+    return "System";
+  }
+
+  function roleInitial(role: DisplayMessage["role"]) {
+    if (role === "assistant") return "S";
+    if (role === "user") return "Y";
+    return "!";
+  }
+
   return (
     <div
       className="relative flex h-full flex-col"
@@ -330,43 +348,45 @@ export function ChatPane({
     >
       {dragActive && (
         <div
-          className="pointer-events-none absolute inset-2 z-30 flex items-center justify-center rounded-2xl border-2 border-dashed border-[var(--accent)] bg-[var(--accent-soft)]/40 backdrop-blur-sm"
+          className="pointer-events-none absolute inset-3 z-30 flex items-center justify-center rounded-[2rem] border-2 border-dashed border-[var(--accent)] bg-[var(--accent-soft)]/60 backdrop-blur-md"
           aria-hidden
         >
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] px-4 py-3 text-sm text-white shadow-lg">
-            Drop to attach
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] px-5 py-4 text-sm font-semibold text-[var(--text)] shadow-xl shadow-slate-300">
+            Drop files to attach
           </div>
         </div>
       )}
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="flex flex-col gap-3 border-b border-[var(--border)] bg-[var(--panel)]/40 px-6 py-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+      <header className="flex flex-col gap-3 border-b border-[var(--border)]/80 bg-white/70 px-5 py-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:px-6">
         <div className="min-w-0">
-          <p id={currentModelId} className="text-sm text-white">
-            <span className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Model: </span>
-            <span className="font-medium">{modelSlug || "No local model selected"}</span>
+          <p id={currentModelId} className="flex flex-wrap items-center gap-2 text-sm text-[var(--text)]">
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+              Active model
+            </span>
+            <span className="font-bold">{modelSlug || "No local model selected"}</span>
             {currentModelHasVision && (
-              <span className="ml-2 inline-flex items-center rounded bg-[var(--accent-soft)] px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white" title="This model accepts images">
+              <span className="inline-flex items-center rounded-full bg-[var(--accent)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm" title="This model accepts images">
                 vision
               </span>
             )}
           </p>
-          <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-            Drop a CT image → BiomedParse · Drop a .nii.gz CTA → vessel segmentation
+          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+            Drag in CT images for BiomedParse or .nii.gz CTA scans for vessel segmentation.
           </p>
         </div>
         <div className="flex w-full flex-col gap-1 sm:w-auto sm:shrink-0 sm:items-end">
-          <label htmlFor={modelSelectId} className="text-xs text-[var(--muted)]">Switch model</label>
+          <label htmlFor={modelSelectId} className="text-xs font-medium text-[var(--muted)]">Switch model</label>
           <select
             id={modelSelectId}
             aria-describedby={currentModelId}
-            className={"w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)] transition " + controlRing}
+            className={"w-full min-w-0 rounded-xl border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-medium text-[var(--text)] shadow-sm transition hover:border-[var(--accent)]/30 sm:min-w-72 " + controlRing}
             value={modelSlug}
             onChange={(e) => onModelChange(e.target.value)}
           >
             {availableModels.length === 0 && <option value="">No local models — visit Hub</option>}
             {availableModels.map((m) => (
-              <option key={m.slug} value={m.slug}>{m.slug}{m.visionEnabled ? " 👁" : ""}</option>
+              <option key={m.slug} value={m.slug}>{m.slug}{m.visionEnabled ? " (vision)" : ""}</option>
             ))}
           </select>
         </div>
@@ -375,60 +395,68 @@ export function ChatPane({
       <CustomInstructions value={systemPrompt} onSave={onSystemPromptSave} />
 
       {/* ── Messages ───────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6">
         {messages.length === 0 ? (
-          <div className="mx-auto mt-12 max-w-md rounded-2xl border border-[var(--border)]/90 bg-gradient-to-b from-[var(--panel-elevated)]/80 to-[var(--panel)]/90 p-8 text-center shadow-lg shadow-black/20">
-            <p className="text-sm font-medium text-[var(--text)]">StrokeChat</p>
-            <p className="mt-2 text-balance text-sm leading-relaxed text-[var(--muted)]">
+          <div className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-white/80 bg-white/80 p-8 text-center shadow-[var(--shadow-soft)] backdrop-blur md:p-10">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] text-base font-bold text-white shadow-lg shadow-blue-200">
+              S
+            </div>
+            <p className="text-lg font-bold text-[var(--text)]">How can StrokeChat help?</p>
+            <p className="mx-auto mt-3 max-w-lg text-balance text-sm leading-7 text-[var(--muted)]">
               Ask anything about stroke, or drop a CT brain scan image to get an
               AI-powered analysis with segmentation overlay. Follow-up questions
               are answered in context.
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {["What are the signs of hemorrhagic stroke?", "Drop a CT scan image"].map((hint) => (
-                <span key={hint} className="rounded-full border border-[var(--border)]/60 px-3 py-1 text-xs text-[var(--muted)]">
+              {emptyPrompts.map((hint) => (
+                <span key={hint} className="rounded-full border border-[var(--border)]/70 bg-white px-3 py-1.5 text-xs font-medium text-[var(--muted)] shadow-sm">
                   {hint}
                 </span>
               ))}
             </div>
           </div>
         ) : (
-          <ul className="mx-auto max-w-3xl space-y-4">
+          <ul className="mx-auto max-w-4xl space-y-5">
             {messages.map((m, i) => (
-              <li key={i} className={"flex " + (m.role === "user" ? "justify-end" : "justify-start")}>
+              <li key={i} className={"flex items-start gap-3 " + (m.role === "user" ? "justify-end" : "justify-start")}>
+                {m.role !== "user" && (
+                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] text-xs font-bold text-white shadow-md shadow-blue-100">
+                    {roleInitial(m.role)}
+                  </div>
+                )}
                 <div className={
-                  "max-w-[85%] rounded-2xl border px-4 py-3 text-sm " +
+                  "max-w-[min(86%,46rem)] rounded-[1.35rem] border px-4 py-3 text-sm shadow-sm " +
                   (m.role === "user"
-                    ? "border-[var(--accent)]/40 bg-[var(--accent-soft)] text-white"
+                    ? "border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 text-[var(--text)]"
                     : m.role === "assistant"
-                      ? "border-[var(--border)] bg-[var(--panel-elevated)] text-white"
-                      : "border-[var(--border)] bg-black/20 text-[var(--muted)]")
+                      ? "border-[var(--border)] bg-white/95 text-[var(--text)] shadow-slate-200"
+                      : "border-[var(--border)] bg-slate-50/90 text-[var(--muted)]")
                 }>
-                  <p className="mb-1 text-[10px] uppercase tracking-[0.18em] text-[var(--muted)]">{m.role}</p>
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">{roleLabel(m.role)}</p>
 
                   {/* Uploaded image thumbnails */}
                   {m.attachedImages && m.attachedImages.length > 0 && (
                     <div className="mb-3 flex flex-wrap gap-2">
                       {m.attachedImages.map((src, ii) => (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img key={ii} src={src} alt="Uploaded scan" className="h-28 w-28 rounded-lg object-cover border border-white/10" />
+                        <img key={ii} src={src} alt="Uploaded scan" className="h-28 w-28 rounded-lg object-cover border border-slate-200 shadow-sm" />
                       ))}
                     </div>
                   )}
 
                   {/* BiomedParse loading state */}
                   {m.biomedPending && (
-                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2">
-                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
+                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-[var(--border)] bg-slate-50 px-3 py-2">
+                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-slate-500" />
                       <span className="text-xs text-[var(--muted)]">Analysing CT scan with BiomedParse (CPU — takes ~2-3 min)…</span>
                     </div>
                   )}
 
                   {/* Vessel segmentation loading state */}
                   {m.vesselPending && (
-                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2">
-                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-cyan-500/20 border-t-cyan-400" />
-                      <span className="text-xs text-cyan-400">Running vessel segmentation (may take a few minutes)…</span>
+                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-2">
+                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-cyan-200 border-t-cyan-600" />
+                      <span className="text-xs text-cyan-700">Running vessel segmentation (may take a few minutes)…</span>
                     </div>
                   )}
 
@@ -440,7 +468,7 @@ export function ChatPane({
                           {/* Verdict row */}
                           <div className="flex items-center gap-2 mb-2">
                             <span className={`h-2.5 w-2.5 shrink-0 rounded-full shadow-sm ${r.detected ? "bg-red-400 shadow-red-400/50" : "bg-green-400 shadow-green-400/50"}`} />
-                            <p className={`text-sm font-semibold ${r.detected ? "text-red-300" : "text-green-300"}`}>
+                            <p className={`text-sm font-semibold ${r.detected ? "text-red-700" : "text-green-700"}`}>
                               {r.detected
                                 ? `${r.target === "bleeding" ? "Hemorrhage" : "Ischemic stroke"} detected`
                                 : `No ${r.target === "bleeding" ? "hemorrhage" : "ischemic stroke"} detected`}
@@ -471,13 +499,13 @@ export function ChatPane({
                   {m.vesselResults && m.vesselResults.length > 0 && (
                     <div className="mb-3 space-y-3">
                       {m.vesselResults.map((r, ri) => (
-                        <div key={ri} className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-3">
+                        <div key={ri} className="rounded-xl border border-cyan-200 bg-cyan-50 p-3">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50" />
-                            <p className="text-sm font-semibold text-cyan-300">
+                            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-cyan-500 shadow-sm shadow-cyan-300/60" />
+                            <p className="text-sm font-semibold text-cyan-800">
                               Vessel segmentation complete
                             </p>
-                            <span className="ml-auto text-xs text-cyan-400/70">
+                            <span className="ml-auto text-xs text-cyan-600">
                               {r.vessel_voxels >= 1_000_000
                                 ? `${(r.vessel_voxels / 1_000_000).toFixed(2)}M`
                                 : `${(r.vessel_voxels / 1000).toFixed(1)}K`} vessel voxels
@@ -505,11 +533,22 @@ export function ChatPane({
 
                   {/* Message text */}
                   {m.reasoning && !m.content && (
-                    <p className="whitespace-pre-wrap text-xs italic leading-6 text-[var(--muted)]">💭 {m.reasoning}</p>
+                    <p className="whitespace-pre-wrap text-xs italic leading-6 text-[var(--muted)]">Thinking: {m.reasoning}</p>
                   )}
-                  {m.content && <p className="whitespace-pre-wrap leading-6">{m.content}</p>}
-                  {!m.content && !m.reasoning && m.pending && <p className="leading-6">…</p>}
+                  {m.content && <p className="whitespace-pre-wrap leading-7">{m.content}</p>}
+                  {!m.content && !m.reasoning && m.pending && (
+                    <div className="flex items-center gap-1.5 py-1" aria-label="Assistant is typing">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--muted)] [animation-delay:-0.2s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--muted)] [animation-delay:-0.1s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--muted)]" />
+                    </div>
+                  )}
                 </div>
+                {m.role === "user" && (
+                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-white text-xs font-bold text-[var(--accent)] shadow-sm">
+                    {roleInitial(m.role)}
+                  </div>
+                )}
               </li>
             ))}
           </ul>

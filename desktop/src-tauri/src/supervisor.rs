@@ -17,6 +17,7 @@ use std::time::{Duration, Instant};
 
 pub const BACKEND_PORT: u16 = 8000;
 pub const BIOMED_PORT: u16 = 8001;
+pub const VESSEL_PORT: u16 = 8002;
 
 /// Filesystem locations, resolved for dev (running from the repo) or bundled (staged under
 /// the app's resource dir). Mirrors `scripts/stage-resources.sh`.
@@ -31,6 +32,8 @@ struct Paths {
     llama_binary: PathBuf,
     bundled_models_dir: PathBuf,
     data_dir: PathBuf,
+    vessel_dir: PathBuf,
+    vessel_python: PathBuf,
 }
 
 fn os_dir() -> &'static str {
@@ -60,6 +63,8 @@ impl Paths {
                 backend_python: bundled_backend_py,
                 biomed_dir: staged.join("biomedparse_service"),
                 biomed_python: staged.join("python-biomedparse").join("bin").join(exe("python3")),
+                vessel_dir: staged.join("vessel_service"),
+                vessel_python: staged.join("python-vessel").join("bin").join(exe("python3")),
                 frontend_server_dir: staged.join("frontend").join("apps").join("product"),
                 node_bin: staged.join("bin").join(os_dir()).join(exe("node")),
                 llama_binary: staged.join("bin").join(os_dir()).join(exe("llama-server")),
@@ -75,6 +80,8 @@ impl Paths {
                 backend_python: repo.join("backend").join(".venv").join("bin").join("python"),
                 biomed_dir: repo.join("biomedparse_service"),
                 biomed_python: repo.join("biomedparse_service").join(".venv").join("bin").join("python"),
+                vessel_dir: repo.join("vessel_service"),
+                vessel_python: repo.join("vessel_service").join(".venv").join("bin").join("python"),
                 frontend_server_dir: repo.join("frontend").join("apps").join("product")
                     .join(".next").join("standalone").join("apps").join("product"),
                 node_bin: PathBuf::from("node"), // dev: from PATH
@@ -97,6 +104,7 @@ impl Paths {
             ("LLAMA_SERVER_BINARY".into(), self.llama_binary.to_string_lossy().into()),
             ("LLAMACPP_N_GPU_LAYERS".into(), gpu_layers),
             ("BIOMEDPARSE_SERVICE_URL".into(), format!("http://127.0.0.1:{BIOMED_PORT}")),
+            ("VESSEL_SERVICE_URL".into(), format!("http://127.0.0.1:{VESSEL_PORT}")),
             ("PYTHONUNBUFFERED".into(), "1".into()),
         ]
     }
@@ -123,6 +131,7 @@ impl Supervisor {
         // 1. Fixed-port conflict detection (the frontend bundle targets BACKEND_PORT).
         ensure_port_free(BACKEND_PORT)?;
         ensure_port_free(BIOMED_PORT)?;
+        ensure_port_free(VESSEL_PORT)?;
         let frontend_port = pick_free_port()?;
 
         // 2. Embedded DB → migrations → seed catalog → register bundled models (blocks).
@@ -163,6 +172,23 @@ impl Supervisor {
             )?;
         } else {
             eprintln!("[supervisor] BiomedParse runtime missing — segmentation disabled");
+        }
+
+        // 5b. Vessel segmentation sidecar (optional — skip if runtime or weights absent).
+        let vessel_weights = std::env::var("VESSEL_WEIGHTS_DIR")
+            .unwrap_or_else(|_| paths.data_dir.join("vessel_weights").to_string_lossy().into());
+        if paths.vessel_python.exists() {
+            self.spawn(
+                Command::new(&paths.vessel_python)
+                    .args(["-m", "uvicorn", "app:app", "--host", "127.0.0.1",
+                           "--port", &VESSEL_PORT.to_string(),
+                           "--app-dir", &paths.vessel_dir.to_string_lossy()])
+                    .current_dir(&paths.vessel_dir)
+                    .env("PYTHONUNBUFFERED", "1")
+                    .env("VESSEL_WEIGHTS_DIR", &vessel_weights),
+            )?;
+        } else {
+            eprintln!("[supervisor] Vessel segmentation runtime missing — vessel analysis disabled");
         }
 
         // 6. Next.js standalone server (free port).

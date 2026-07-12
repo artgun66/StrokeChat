@@ -10,6 +10,7 @@ import io
 import os
 import sys
 import logging
+import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -24,11 +25,24 @@ from PIL import Image
 # ── paths ────────────────────────────────────────────────────────────────────
 SERVICE_DIR = Path(__file__).parent
 BIOMEDPARSE_DIR = SERVICE_DIR.parent / "artun_model" / "BiomedParse"
+# Only the fine-tuned checkpoint is shipped; the un-fine-tuned base (biomedparse_v2.ckpt)
+# was removed since it is never used when the fine-tuned weights are present.
 FINETUNED_CKPT = SERVICE_DIR.parent / "artun_model" / "outputs" / "checkpoints" / "last-v5.ckpt"
-BASE_CKPT = BIOMEDPARSE_DIR / "checkpoints" / "biomedparse_v2.ckpt"
 
 sys.path.insert(0, str(BIOMEDPARSE_DIR))
+sys.path.insert(0, str(SERVICE_DIR))  # so detectron2_shim is importable
 os.chdir(BIOMEDPARSE_DIR)  # Hydra resolves config paths relative to cwd
+
+# Register the shim as 'detectron2' before any BiomedParse code imports it.
+# BiomedParse tries `from detectron2.layers import Conv2d` and falls back to
+# plain torch.nn.Conv2d (which rejects norm=) when detectron2 isn't installed.
+# Wiring the shim into sys.modules prevents that fallback.
+import detectron2_shim as _d2
+import detectron2_shim.layers as _d2_layers
+import detectron2_shim.modeling as _d2_modeling
+sys.modules.setdefault("detectron2", _d2)
+sys.modules.setdefault("detectron2.layers", _d2_layers)
+sys.modules.setdefault("detectron2.modeling", _d2_modeling)
 
 import hydra
 from hydra import compose
@@ -66,14 +80,19 @@ def _load_checkpoint(model, path: Path, device: torch.device):
 
 def _init_model():
     global _model, _device
+    # MPS kernel fallbacks for this model architecture cost more than they save;
+    # CPU with all threads is consistently faster here.
     _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.info("Using device: %s", _device)
+    torch.set_num_threads(os.cpu_count() or 4)
+    logger.info("Using device: %s  threads: %d", _device, torch.get_num_threads())
 
     GlobalHydra.instance().clear()
     hydra.initialize_config_dir(config_dir=str(BIOMEDPARSE_DIR / "configs"), job_name="biomedparse_service", version_base=None)
     cfg = compose(config_name="evaluate_biomedparse_2D")
 
-    ckpt_path = FINETUNED_CKPT if FINETUNED_CKPT.exists() else BASE_CKPT
+    if not FINETUNED_CKPT.exists():
+        raise FileNotFoundError(f"fine-tuned checkpoint not found: {FINETUNED_CKPT}")
+    ckpt_path = FINETUNED_CKPT
     logger.info("Loading checkpoint: %s", ckpt_path)
 
     model = hydra.utils.instantiate(cfg.model, _convert_="object")
@@ -81,6 +100,44 @@ def _init_model():
     model = model.to(_device).eval()
     _model = model
     logger.info("Model ready")
+
+
+# ── DICOM helpers ────────────────────────────────────────────────────────────
+
+def _is_dicom(raw: bytes) -> bool:
+    # Standard DICOM files carry the magic "DICM" at byte offset 128.
+    return len(raw) > 132 and raw[128:132] == b"DICM"
+
+
+def _dicom_to_png_bytes(raw: bytes) -> bytes:
+    """Convert a DICOM file to a PNG using a brain CT window.
+
+    Brain window (WL=40 HU, WW=80 HU → range 0–80 HU) is the standard
+    preprocessing for stroke and hemorrhage detection, matching the expected
+    input distribution of the fine-tuned checkpoint.
+    """
+    import pydicom
+
+    ds = pydicom.dcmread(io.BytesIO(raw), force=True)
+    arr = ds.pixel_array.astype(float)
+
+    # Multi-frame (e.g. full CT series): take the middle slice.
+    if arr.ndim == 3:
+        arr = arr[arr.shape[0] // 2]
+
+    # Convert stored values to Hounsfield Units.
+    slope = float(getattr(ds, "RescaleSlope", 1))
+    intercept = float(getattr(ds, "RescaleIntercept", 0))
+    hu = arr * slope + intercept
+
+    # Brain window: WL=40, WW=80 → [0, 80] HU → [0, 255] uint8.
+    lo, hi = 0.0, 80.0
+    windowed = np.clip(hu, lo, hi)
+    windowed = ((windowed - lo) / (hi - lo) * 255).astype(np.uint8)
+
+    buf = io.BytesIO()
+    Image.fromarray(windowed).convert("RGB").save(buf, format="PNG")
+    return buf.getvalue()
 
 
 # ── image helpers ─────────────────────────────────────────────────────────────
@@ -98,7 +155,7 @@ def _preprocess(img_bytes: bytes) -> torch.Tensor:
 
 def _run_inference(image_tensor: torch.Tensor, prompt: str):
     image_tensor = image_tensor.to(_device)
-    with torch.no_grad():
+    with torch.inference_mode():
         out = _model({"image": image_tensor, "text": [prompt]}, mode="eval")
     preds = out["predictions"]
 
@@ -116,7 +173,7 @@ def _run_inference(image_tensor: torch.Tensor, prompt: str):
     gmasks = preds.get("pred_gmasks")
     if gmasks is not None:
         if gmasks.shape[-2:] != (512, 512):
-            gmasks = F.interpolate(gmasks, size=(512, 512), mode="bicubic",
+            gmasks = F.interpolate(gmasks.float(), size=(512, 512), mode="bicubic",
                                    align_corners=False, antialias=True)
         mask_prob = torch.sigmoid(gmasks)
         if mask_prob.shape[1] > 1:
@@ -169,9 +226,25 @@ def _encode_original(img_bytes: bytes) -> str:
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
 
+_model_lock = threading.Lock()
+
+
+def _ensure_model():
+    """Load the model once, on first use. Keeps service startup light — the fine-tuned
+    checkpoint is ~4 GB and loading it eagerly at launch can exhaust RAM on small machines."""
+    global _model
+    if _model is not None:
+        return
+    with _model_lock:
+        if _model is None:
+            _init_model()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    _init_model()
+    # Kick off model loading in a background thread so the port binds immediately
+    # but the model is hot before the first /segment request arrives.
+    threading.Thread(target=_ensure_model, daemon=True).start()
     yield
 
 
@@ -194,17 +267,21 @@ async def segment(
     image: UploadFile = File(...),
     prompt: str = Form("is there a bleeding in the image"),
 ):
-    if _model is None:
-        raise HTTPException(503, "Model not loaded yet")
-
     img_bytes = await image.read()
     if not img_bytes:
         raise HTTPException(400, "Empty image")
+
+    if _is_dicom(img_bytes):
+        try:
+            img_bytes = _dicom_to_png_bytes(img_bytes)
+        except Exception as exc:
+            raise HTTPException(400, f"Could not read DICOM file: {exc}") from exc
 
     # resolve preset shorthand → full prompt
     full_prompt = PRESET_PROMPTS.get(prompt.strip().lower(), prompt)
 
     try:
+        _ensure_model()  # inside try/except so load failures are logged and returned as 500 detail
         tensor = _preprocess(img_bytes)
         detected, confidence, mask = _run_inference(tensor, full_prompt)
         overlay_b64 = _make_overlay(img_bytes, mask)

@@ -1,29 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  /* Cool metallic slate + deep blue — calmer than “demo night” */
-  --bg: #0a0e13;
-  --bg-elevated: #0e131b;
-  --panel: #121a24;
-  --panel-elevated: #182230;
-  --border: #283548;
-  --text: #eef2f8;
-  --muted: #8e9db3;
-  --accent: #3d5a80;
-  --accent-2: #5b8a9a;
-  --accent-soft: color-mix(in oklab, var(--accent) 28%, transparent);
-  /* Semantic UI tokens (Hub downloads, form feedback) */
-  --success: #6bc49a;
-  --success-dim: color-mix(in oklab, var(--success) 22%, transparent);
-  --error: #e07a7a;
-  --error-dim: color-mix(in oklab, var(--error) 18%, transparent);
-  --link: #a8bdd9;
-  --progress-track: #141c26;
-  --progress-fill: color-mix(in oklab, var(--accent) 70%, #8eb8e8 30%);
-  /* Focus ring: visible on dark panels (WCAG focus guidance) */
-  --focus-ring: #9bb4d4;
-  --ring-offset: var(--panel);
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg: #f8fafc;
+  --bg-elevated: #ffffff;
+
+  /* Panels */
+  --panel: #ffffff;
+  --panel-elevated: #f1f5f9;
+  --panel-glass: color-mix(in oklab, var(--panel) 82%, transparent);
+
+  /* Borders */
+  --border: #e2e8f0;
+
+  /* Typography */
+  --text: #0f172a;
+  --muted: #64748b;
+
+  /* Brand / accent — medical blue */
+  --accent: #2563eb;
+  --accent-2: #0891b2;
+  --accent-soft: color-mix(in oklab, var(--accent) 10%, transparent);
+
+  /* Semantic tokens */
+  --success: #16a34a;
+  --success-dim: color-mix(in oklab, var(--success) 12%, transparent);
+  --error: #dc2626;
+  --error-dim: color-mix(in oklab, var(--error) 10%, transparent);
+  --link: #2563eb;
+
+  /* Progress bar */
+  --progress-track: #e2e8f0;
+  --progress-fill: var(--accent);
+
+  /* Focus ring — WCAG compliant on white */
+  --focus-ring: #3b82f6;
+  --ring-offset: #ffffff;
+  --shadow-soft: 0 22px 70px color-mix(in oklab, #0f172a 10%, transparent);
 }
 
 html,
@@ -42,8 +57,11 @@ body {
 
 body {
   background:
-    radial-gradient(1200px 500px at 15% 0%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 55%),
-    radial-gradient(900px 420px at 90% 5%, color-mix(in oklab, var(--accent-2) 8%, transparent), transparent 50%),
+    radial-gradient(ellipse 980px 560px at -10% -10%,
+      color-mix(in oklab, var(--accent) 10%, transparent), transparent 58%),
+    radial-gradient(ellipse 720px 420px at 105% 0%,
+      color-mix(in oklab, var(--accent-2) 10%, transparent), transparent 54%),
+    linear-gradient(180deg, color-mix(in oklab, #ffffff 72%, transparent), transparent 28%),
     var(--bg);
   color: var(--text);
 }
@@ -51,4 +69,12 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+* {
+  scrollbar-color: color-mix(in oklab, var(--muted) 32%, transparent) transparent;
 }

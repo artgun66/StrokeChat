@@ -89,7 +89,7 @@ export default function VesselSegmentationPage() {
             nnUNet · robust-vessel-segmentation · 3D CTA → binary vessel mask
           </p>
         </div>
-        <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+        <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-700">
           Research only
         </span>
       </div>
@@ -111,7 +111,7 @@ export default function VesselSegmentationPage() {
             className={`flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition ${
               dragging
                 ? "border-[var(--accent)] bg-[var(--accent)]/10"
-                : "border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-white/[0.02]"
+                : "border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-slate-50"
             }`}
           >
             {file ? (

@@ -32,11 +32,11 @@ function formatShortDate(iso: string): string {
 function statusClass(status: ModelFile["status"]): string {
   switch (status) {
     case "ready":
-      return "border-emerald-500/30 bg-emerald-500/10 text-emerald-200/95";
+      return "border-emerald-200 bg-emerald-50 text-emerald-700";
     case "failed":
-      return "border-red-500/30 bg-red-500/10 text-red-200/95";
+      return "border-red-200 bg-red-50 text-red-700";
     default:
-      return "border-[var(--border)]/80 bg-white/[0.04] text-[var(--muted)]";
+      return "border-[var(--border)] bg-slate-100 text-[var(--muted)]";
   }
 }
 
@@ -75,7 +75,7 @@ export default function ModelsPage() {
             {items.length} file{items.length === 1 ? "" : "s"} on disk.
           </span>{" "}
           Paths under{" "}
-          <code className="rounded border border-[var(--border)]/80 bg-white/[0.04] px-1 py-0.5 text-[10px] text-[var(--text)]/85">
+          <code className="rounded border border-[var(--border)] bg-slate-100 px-1 py-0.5 text-[10px] text-[var(--text)]">
             $DATA_DIR/models/&lt;slug&gt;/
           </code>
         </p>
@@ -85,7 +85,7 @@ export default function ModelsPage() {
         <p className="mt-6 text-xs text-[var(--muted)]">
           Nothing installed yet.{" "}
           <a
-            className="font-medium text-[var(--link)] underline decoration-white/15 underline-offset-2 transition hover:decoration-[var(--link)]/60"
+            className="font-medium text-[var(--link)] underline decoration-[var(--link)]/30 underline-offset-2 transition hover:decoration-[var(--link)]/70"
             href="/hub"
           >
             Open the catalog
@@ -93,7 +93,7 @@ export default function ModelsPage() {
           to download a model.
         </p>
       ) : (
-        <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border)]/90 bg-[var(--panel)]/50 shadow-sm shadow-black/20">
+        <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--panel)] shadow-sm shadow-slate-200">
           <table className="w-full min-w-[680px] table-fixed border-collapse text-left text-sm">
             <caption className="sr-only">
               Installed model files: size, status, path, checksum, last updated
@@ -112,7 +112,7 @@ export default function ModelsPage() {
               {items.map((m) => (
                 <tr
                   key={m.id}
-                  className="border-b border-[var(--border)]/50 last:border-0 odd:bg-white/[0.01] hover:bg-white/[0.03]"
+                  className="border-b border-[var(--border)]/50 last:border-0 odd:bg-slate-50/60 hover:bg-slate-50"
                 >
                   <td className="px-3 py-1.5 align-top">
                     <div className="font-medium leading-tight text-[var(--text)]">

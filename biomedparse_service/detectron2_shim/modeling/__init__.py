@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from torch import nn
 
-from detectron2.layers import ShapeSpec
+from detectron2_shim.layers import ShapeSpec
 
 
 class Registry:

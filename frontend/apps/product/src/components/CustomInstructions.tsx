@@ -83,7 +83,7 @@ export function CustomInstructions({ value, onSave }: Props) {
           }}
           placeholder={PLACEHOLDER}
           rows={4}
-          className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm text-white placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none"
+          className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:outline-none"
         />
         <div className="mt-2 flex items-center justify-between gap-3">
           <p className="text-[11px] text-[var(--muted)]">
@@ -95,7 +95,7 @@ export function CustomInstructions({ value, onSave }: Props) {
               className={
                 "text-[11px] tabular-nums " +
                 (draft.length > MAX_CHARS - 200
-                  ? "text-amber-400"
+                  ? "text-amber-600"
                   : "text-[var(--muted)]")
               }
             >
@@ -105,7 +105,7 @@ export function CustomInstructions({ value, onSave }: Props) {
               type="button"
               onClick={cancel}
               disabled={busy}
-              className="rounded-md border border-[var(--border)] px-3 py-1 text-xs hover:bg-white/5 disabled:opacity-50"
+              className="rounded-md border border-[var(--border)] px-3 py-1 text-xs text-[var(--muted)] hover:bg-slate-100 hover:text-[var(--text)] disabled:opacity-50"
             >
               Cancel
             </button>
@@ -119,7 +119,7 @@ export function CustomInstructions({ value, onSave }: Props) {
             </button>
           </div>
         </div>
-        {error && <p className="mt-1 text-[11px] text-red-400">{error}</p>}
+        {error && <p className="mt-1 text-[11px] text-red-600">{error}</p>}
       </section>
     );
   }
@@ -131,7 +131,7 @@ export function CustomInstructions({ value, onSave }: Props) {
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-xs text-[var(--muted)] hover:text-white"
+          className="text-xs text-[var(--muted)] hover:text-[var(--text)]"
         >
           + Add custom instructions for the AI in this thread
         </button>
@@ -148,12 +148,12 @@ export function CustomInstructions({ value, onSave }: Props) {
         <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--muted)]">
           Custom instructions
         </p>
-        <p className="mt-0.5 truncate text-xs text-white/80">{preview}</p>
+        <p className="mt-0.5 truncate text-xs text-[var(--text)]">{preview}</p>
       </div>
       <button
         type="button"
         onClick={() => setEditing(true)}
-        className="shrink-0 text-xs text-[var(--muted)] underline-offset-4 hover:text-white hover:underline"
+        className="shrink-0 text-xs text-[var(--muted)] underline-offset-4 hover:text-[var(--text)] hover:underline"
       >
         Edit
       </button>

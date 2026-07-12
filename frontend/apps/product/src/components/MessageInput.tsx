@@ -219,6 +219,8 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
   const [voiceSupported, setVoiceSupported] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SR | null>(null);
+  const controlRing =
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--ring-offset)]";
 
   useEffect(() => {
     setVoiceSupported(getSpeechRecognitionCtor() !== null);
@@ -414,15 +416,15 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
     (draft.trim().length > 0 || attachments.length > 0);
 
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--panel)]/50 p-4">
-      <div className="mx-auto max-w-3xl">
+    <footer className="border-t border-[var(--border)]/80 bg-white/75 p-3 backdrop-blur-xl md:p-4">
+      <div className="mx-auto max-w-4xl">
         {(attachments.length > 0 || pendingPdfs > 0 || attachError) && (
-          <div className="mb-2 flex flex-wrap items-center gap-2">
+          <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[var(--border)]/70 bg-white/70 p-2 shadow-sm">
             {attachments.map((a, i) =>
               a.kind === "image" ? (
                 <span
                   key={`${a.name}-${i}`}
-                  className="inline-flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--panel)] py-1 pl-1 pr-2 text-xs text-white/90"
+                  className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--panel)] py-1 pl-1 pr-2 text-xs text-[var(--text)] shadow-sm"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -435,7 +437,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
                   <button
                     type="button"
                     onClick={() => removeAttachment(i)}
-                    className="-mr-0.5 rounded p-0.5 text-[var(--muted)] hover:bg-white/10 hover:text-white"
+                    className={"-mr-0.5 rounded-md p-0.5 text-[var(--muted)] hover:bg-slate-100 hover:text-[var(--text)] " + controlRing}
                     aria-label={`Remove image ${a.name}`}
                   >
                     ×
@@ -444,18 +446,18 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
               ) : a.kind === "nifti" ? (
                 <span
                   key={`${a.name}-${i}`}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-300"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-200 bg-cyan-50 px-2 py-1 text-xs text-cyan-800 shadow-sm"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/>
                   </svg>
                   <span className="max-w-[140px] truncate">{a.name}</span>
-                  <span className="text-cyan-500/60">{formatBytes(a.size)}</span>
-                  <span className="rounded bg-cyan-500/20 px-1 text-[9px] uppercase tracking-wide">CTA</span>
+                  <span className="text-cyan-600">{formatBytes(a.size)}</span>
+                  <span className="rounded bg-cyan-100 px-1 text-[9px] uppercase tracking-wide text-cyan-700">CTA</span>
                   <button
                     type="button"
                     onClick={() => removeAttachment(i)}
-                    className="-mr-0.5 rounded p-0.5 text-cyan-500/60 hover:bg-white/10 hover:text-white"
+                    className={"-mr-0.5 rounded-md p-0.5 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-800 " + controlRing}
                     aria-label={`Remove scan ${a.name}`}
                   >
                     ×
@@ -464,7 +466,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
               ) : (
                 <span
                   key={`${a.name}-${i}`}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--panel)] px-2 py-1 text-xs text-white/90"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--panel)] px-2 py-1 text-xs text-[var(--text)] shadow-sm"
                 >
                   <svg
                     width="12"
@@ -485,7 +487,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
                   <button
                     type="button"
                     onClick={() => removeAttachment(i)}
-                    className="-mr-0.5 rounded p-0.5 text-[var(--muted)] hover:bg-white/10 hover:text-white"
+                    className={"-mr-0.5 rounded-md p-0.5 text-[var(--muted)] hover:bg-slate-100 hover:text-[var(--text)] " + controlRing}
                     aria-label={`Remove attachment ${a.name}`}
                   >
                     ×
@@ -494,18 +496,19 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
               ),
             )}
             {pendingPdfs > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--panel)] px-2 py-1 text-xs text-[var(--muted)]">
+              <span className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--panel)] px-2 py-1 text-xs text-[var(--muted)] shadow-sm">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--accent)]" />
                 Extracting {pendingPdfs} PDF{pendingPdfs === 1 ? "" : "s"}…
               </span>
             )}
             {attachError && (
-              <span className="text-xs text-amber-400">{attachError}</span>
+              <span className="text-xs text-amber-600">{attachError}</span>
             )}
           </div>
         )}
 
-        <div className="flex items-end gap-2">
+        <div className="rounded-[1.6rem] border border-[var(--border)] bg-white p-2 shadow-lg shadow-slate-200/80 transition focus-within:border-[var(--accent)]/40 focus-within:shadow-xl">
+          <div className="flex items-end gap-2">
           {/* Attach */}
           <button
             type="button"
@@ -513,7 +516,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
             disabled={disabled}
             aria-label="Attach a file"
             title="Attach a file (text, code, data, or PDF)"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--panel)] text-[var(--muted)] transition hover:bg-white/5 hover:text-white disabled:opacity-40"
+            className={"flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)] bg-slate-50 text-[var(--muted)] transition hover:bg-slate-100 hover:text-[var(--text)] disabled:opacity-40 " + controlRing}
           >
             <svg
               width="18"
@@ -539,7 +542,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
           />
 
           <textarea
-            className="min-h-12 flex-1 resize-none rounded-xl border border-[var(--border)] bg-[var(--panel)] px-4 py-3 text-sm text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--ring-offset)]"
+            className="min-h-12 flex-1 resize-none rounded-2xl border-0 bg-transparent px-3 py-3 text-sm leading-6 text-[var(--text)] transition focus-visible:outline-none placeholder:text-[var(--muted)]"
             aria-label="Message"
             placeholder={
               hasModel
@@ -568,10 +571,12 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
               aria-pressed={recording}
               title={recording ? "Stop recording" : "Speak instead of typing"}
               className={
-                "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition disabled:opacity-40 " +
+                "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border transition disabled:opacity-40 " +
                 (recording
-                  ? "border-red-500/50 bg-red-500/15 text-red-300 animate-pulse"
-                  : "border-[var(--border)] bg-[var(--panel)] text-[var(--muted)] hover:bg-white/5 hover:text-white")
+                  ? "animate-pulse border-red-500/50 bg-red-500/15 text-red-500"
+                  : "border-[var(--border)] bg-slate-50 text-[var(--muted)] hover:bg-slate-100 hover:text-[var(--text)]") +
+                " " +
+                controlRing
               }
             >
               <svg
@@ -595,7 +600,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
           <Button
             onClick={handleSend}
             disabled={!canSend}
-            className="h-11 shrink-0 rounded-xl bg-[var(--accent)] px-5 hover:brightness-110"
+            className="h-11 shrink-0 rounded-2xl bg-gradient-to-b from-[var(--accent)] to-blue-700 px-5 font-bold shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:brightness-110 disabled:translate-y-0 disabled:shadow-none"
           >
             {disabled
               ? "Thinking..."
@@ -603,6 +608,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
                 ? "Reading PDF…"
                 : "Send"}
           </Button>
+          </div>
         </div>
       </div>
     </footer>

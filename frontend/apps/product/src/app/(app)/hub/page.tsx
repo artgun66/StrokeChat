@@ -115,7 +115,7 @@ export default function HubPage() {
             {sorted.map((m) => (
               <tr
                 key={m.id}
-                className="border-b border-[var(--border)]/50 last:border-0 odd:bg-white/[0.01] hover:bg-white/[0.03]"
+                className="border-b border-[var(--border)]/50 last:border-0 odd:bg-slate-50/60 hover:bg-slate-50"
               >
                 <td className="px-3 py-1.5 align-top">
                   <div className="font-medium leading-tight text-[var(--text)]">
@@ -127,7 +127,7 @@ export default function HubPage() {
                 </td>
                 <td className="px-2 py-1.5 align-top">
                   <span
-                    className="inline-block rounded border border-[var(--border)]/80 bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-[var(--text)]"
+                    className="inline-block rounded border border-[var(--border)] bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-[var(--text)]"
                     title={TIER_HINT[m.tier]}
                   >
                     {TIER_SHORT[m.tier]}

@@ -1,0 +1,16 @@
+# Exclude everything except the frontend app itself
+../../vessel_weights
+../../vessel_service
+../../backend
+../../biomedparse_service
+../../modal_functions
+../../desktop
+../../data
+../../docs
+../../infra
+../../scripts
+../../agent
+../../artun_model
+node_modules
+.next
+out

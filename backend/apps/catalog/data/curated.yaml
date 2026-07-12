@@ -11,6 +11,28 @@
 # model org's LICENSE file isn't directly fetchable — that's informational and
 # doesn't block downloads.
 
+# ===== Vision — medical imaging =====
+
+- slug: qwen2.5-vl-7b
+  display_name: Qwen 2.5 VL 7B Instruct (Q4_K_M, vision)
+  family: qwen2.5-vl
+  tier: small
+  source_url: https://huggingface.co/bartowski/Qwen2.5-VL-7B-Instruct-GGUF/resolve/main/Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf
+  source_repo: bartowski/Qwen2.5-VL-7B-Instruct-GGUF
+  source_revision: main
+  format: gguf
+  compatible_engines: [llamacpp]
+  sha256: PLACEHOLDER
+  size_bytes: 4685045376
+  mmproj_url: https://huggingface.co/bartowski/Qwen2.5-VL-7B-Instruct-GGUF/resolve/main/mmproj-Qwen2.5-VL-7B-Instruct-f16.gguf
+  mmproj_sha256: PLACEHOLDER
+  mmproj_size_bytes: 896960352
+  vision_enabled: true
+  license_spdx: apache-2.0
+  license_url: https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct/blob/main/LICENSE
+  license_text_sha256: PLACEHOLDER_LICENSE_SHA
+  allowed_use: commercial
+
 # ===== Tiny — laptop CPU / edge =====
 
 - slug: smollm3-3b-q4

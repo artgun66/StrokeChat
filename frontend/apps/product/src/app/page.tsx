@@ -1,14 +1,3 @@
-async function getBackendStatus() {
-  const url = process.env.API_URL ?? "http://localhost:8000";
-  try {
-    const res = await fetch(`${url}/healthz`, { cache: "no-store" });
-    if (!res.ok) return { ok: false };
-    return { ok: true };
-  } catch {
-    return { ok: false };
-  }
-}
-
 const CAPABILITIES = [
   {
     icon: (
@@ -34,69 +23,82 @@ const CAPABILITIES = [
     cta: "Upload scan",
     accent: "from-red-500/80 to-red-700/80",
   },
+  {
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75c2.25-4.5 5.25-6.75 9-6.75 2.25 0 4.125.75 5.625 2.25M19.5 11.25c-2.25 4.5-5.25 6.75-9 6.75-2.25 0-4.125-.75-5.625-2.25M8.25 9.75c1.5 0 2.25 1.5 3.75 1.5s2.25-1.5 3.75-1.5M8.25 14.25c1.5 0 2.25-1.5 3.75-1.5s2.25 1.5 3.75 1.5" />
+      </svg>
+    ),
+    title: "Segment vessels",
+    description: "Upload 3D CTA volumes for nnUNet vessel segmentation, preview overlays, and export a binary mask.",
+    href: "/vessel-segmentation",
+    cta: "Segment CTA",
+    accent: "from-cyan-500 to-blue-600",
+  },
 ];
 
 
 export default async function Page() {
-  const status = await getBackendStatus();
-
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12 md:px-10 md:py-16">
-
-      {/* ── Status dot ─────────────────────────────────────────────────────── */}
-      <div className="mb-8 flex items-center gap-2">
-        <span className={`h-2 w-2 rounded-full ${status.ok ? "bg-emerald-400 shadow-[0_0_8px_#34d399]" : "bg-amber-400"}`} />
-        <span className="text-xs text-[var(--muted)]">
-          {status.ok ? "Assistant online" : "Assistant offline"}
-        </span>
-      </div>
+    <main className="mx-auto max-w-6xl px-5 py-10 md:px-10 md:py-16">
 
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <div className="mb-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
-          StrokeChat
-        </p>
-        <h1 className="mt-2 text-4xl font-bold tracking-tight text-[var(--text)] md:text-5xl">
-          Your guide to{" "}
-          <span className="bg-gradient-to-r from-[var(--text)] via-white to-[var(--link)] bg-clip-text text-transparent">
-            understanding stroke
-          </span>
-        </h1>
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--muted)]">
-          Ask questions about stroke in plain language, or upload a CT scan for AI-powered
-          detection and segmentation of hemorrhagic and ischemic lesions.
-        </p>
+      <div className="relative mb-10 overflow-hidden rounded-[2rem] border border-white/80 bg-[var(--panel-glass)] p-7 shadow-[var(--shadow-soft)] backdrop-blur-xl md:p-10">
+        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[var(--accent)]/10 blur-3xl" aria-hidden />
+        <div className="absolute bottom-0 right-8 hidden h-28 w-44 rounded-t-full border border-cyan-200/70 bg-cyan-50/70 md:block" aria-hidden />
+        <div className="relative max-w-3xl">
+          <h1 className="text-4xl font-bold tracking-tight text-[var(--text)] md:text-6xl">
+            Understand stroke findings with{" "}
+            <span className="bg-gradient-to-r from-[var(--accent-2)] via-[var(--accent)] to-blue-800 bg-clip-text text-transparent">
+              guided AI analysis
+            </span>
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--muted)] md:text-lg">
+            Ask clinical questions, analyse CT slices, and segment CTA vessels in a local-first research prototype designed for careful exploration.
+          </p>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="/threads"
+              className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-b from-[var(--accent)] to-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              Start a chat
+            </a>
+            <a
+              href="/biomedparse"
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-[var(--text)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)]/30"
+            >
+              Analyse CT scan
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* ── Combined card ──────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[var(--border)]/80 bg-[var(--panel)]/60 p-6">
+      <div className="rounded-[1.75rem] border border-white/80 bg-[var(--panel-glass)] p-5 shadow-lg shadow-slate-200/70 backdrop-blur md:p-6">
         <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">What you can do</p>
-        <div className="flex flex-col divide-y divide-[var(--border)]/50">
+        <div className="grid gap-3 md:grid-cols-3">
           {CAPABILITIES.map((c) => (
-            <div key={c.href} className="flex items-start gap-4 py-5 first:pt-0 last:pb-0">
-              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${c.accent} text-white shadow-md`}>
+            <a key={c.href} href={c.href} className="group rounded-2xl border border-[var(--border)]/70 bg-white/75 p-4 transition hover:-translate-y-0.5 hover:border-[var(--accent)]/30 hover:shadow-lg hover:shadow-slate-200">
+              <div className={`mb-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${c.accent} text-white shadow-md`}>
                 {c.icon}
               </div>
-              <div className="flex flex-1 flex-col gap-1">
-                <p className="text-sm font-semibold text-[var(--text)]">{c.title}</p>
-                <p className="text-sm leading-relaxed text-[var(--muted)]">{c.description}</p>
+              <div className="flex min-h-32 flex-col">
+                <p className="text-sm font-bold text-[var(--text)]">{c.title}</p>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{c.description}</p>
+                <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-xs font-bold text-[var(--accent)]">
+                  {c.cta}
+                  <svg className="h-3 w-3 transition group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
               </div>
-              <a
-                href={c.href}
-                className="group inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-[var(--text)] transition hover:bg-white/[0.08]"
-              >
-                {c.cta}
-                <svg className="h-3 w-3 transition group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </a>
-            </div>
+            </a>
           ))}
         </div>
       </div>
 
       {/* ── Desktop download ───────────────────────────────────────────────── */}
-      <div className="mt-8 rounded-2xl border border-[var(--border)]/80 bg-[var(--panel)]/60 p-6">
+      <div className="mt-8 rounded-[1.75rem] border border-white/80 bg-[var(--panel-glass)] p-6 shadow-lg shadow-slate-200/70 backdrop-blur">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Run locally</p>

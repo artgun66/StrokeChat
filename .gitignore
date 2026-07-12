@@ -71,3 +71,8 @@ secrets/
 # electron-builder resources we DO need tracked, e.g. entitlements).
 !/desktop/build/
 !/desktop/build/**
+.vercel
+.env*
+
+# Large GPU model weights — live on Modal, not tracked in git
+vessel_weights/

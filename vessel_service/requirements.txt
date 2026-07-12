@@ -1,0 +1,11 @@
+nnunetv2
+nibabel
+SimpleITK
+scipy
+numpy<2.0
+pandas
+tqdm
+fastapi==0.111.0
+uvicorn==0.30.1
+python-multipart==0.0.9
+pillow
