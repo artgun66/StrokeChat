@@ -301,7 +301,7 @@ function SliceCard({ result, index }: { result: SliceResult; index: number }) {
       </div>
 
       {/* ASPECTS scorer — ischemic stroke only (not applicable to hemorrhage) */}
-      {result.prompt === "stroke" && (
+      {result.prompt.toLowerCase().includes("stroke") && (
         <AspectsScorer
           confidence={result.confidence}
           maskAreaPct={result.mask_area_pct}
