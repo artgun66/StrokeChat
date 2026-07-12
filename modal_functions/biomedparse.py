@@ -69,6 +69,28 @@ def segment(item: dict):
     prompt = item.get("prompt", "is there a bleeding in the image")
     image_bytes = base64.b64decode(image_b64)
 
+    # DICOM files aren't decodable by cv2.imdecode — detect via the "DICM"
+    # magic at byte 128 and convert to a brain-windowed PNG first.
+    if len(image_bytes) > 132 and image_bytes[128:132] == b"DICM":
+        import pydicom
+
+        ds = pydicom.dcmread(io.BytesIO(image_bytes), force=True)
+        arr = ds.pixel_array.astype(np.float32)
+        # Multi-frame series: take the middle slice.
+        if arr.ndim == 3:
+            arr = arr[arr.shape[0] // 2]
+        # Stored values → Hounsfield Units.
+        slope = float(getattr(ds, "RescaleSlope", 1))
+        intercept = float(getattr(ds, "RescaleIntercept", 0))
+        hu = arr * slope + intercept
+        # Brain window: WL=40, WW=80 → [0, 80] HU → [0, 255] uint8.
+        lo, hi = 0.0, 80.0
+        windowed = np.clip(hu, lo, hi)
+        windowed = ((windowed - lo) / (hi - lo) * 255).astype(np.uint8)
+        buf = io.BytesIO()
+        Image.fromarray(windowed).convert("RGB").save(buf, format="PNG")
+        image_bytes = buf.getvalue()
+
     sys.path.insert(0, BIOMEDPARSE_SRC)
     sys.path.insert(0, "/")
     import detectron2_shim as _d2
