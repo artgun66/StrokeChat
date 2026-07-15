@@ -495,7 +495,7 @@ export default function BiomedParsePage() {
               }
               <button
                 onClick={() => removeFile(i)}
-                className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white group-hover:flex"
+                className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white group-hover:flex"
               >×</button>
               <p className="mt-0.5 max-w-[64px] truncate text-xs text-[var(--muted)]/60">{f.name}</p>
             </div>
