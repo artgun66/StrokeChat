@@ -84,20 +84,20 @@ export default function VesselSegmentationPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-[var(--text)]">Brain Vessel Segmentation</h1>
-          <p className="mt-0.5 text-sm text-[var(--muted)]">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--text)]">Brain Vessel Segmentation</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             nnUNet · robust-vessel-segmentation · 3D CTA → binary vessel mask
           </p>
         </div>
-        <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-700">
+        <span className="rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
           Research only
         </span>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
 
         {/* Left: upload + run */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
 
           {/* Drop zone */}
           <div
@@ -108,10 +108,10 @@ export default function VesselSegmentationPage() {
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={onDrop}
-            className={`flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition ${
+            className={`flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition ${
               dragging
                 ? "border-[var(--accent)] bg-[var(--accent)]/10"
-                : "border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-slate-50"
+                : "border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-[var(--panel-elevated)]"
             }`}
           >
             {file ? (
@@ -121,7 +121,7 @@ export default function VesselSegmentationPage() {
                     d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                 </svg>
                 <p className="text-sm font-medium text-[var(--accent)]">{file.name}</p>
-                <p className="text-[11px] text-[var(--muted)]/60">NIfTI ready — no browser preview available</p>
+                <p className="text-xs text-[var(--muted)]">NIfTI ready — no browser preview available</p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 text-center px-4">
@@ -132,7 +132,7 @@ export default function VesselSegmentationPage() {
                 <p className="text-sm text-[var(--muted)]">
                   Drop a CTA scan or <span className="text-[var(--accent)]">browse</span>
                 </p>
-                <p className="text-[11px] text-[var(--muted)]/50">NIfTI (.nii.gz, .nii) or NRRD (.nrrd)</p>
+                <p className="text-xs text-[var(--muted)]">NIfTI (.nii.gz, .nii) or NRRD (.nrrd)</p>
               </div>
             )}
             <input
@@ -167,37 +167,37 @@ export default function VesselSegmentationPage() {
           </button>
 
           {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
+            <div className="rounded-xl border border-[var(--error)]/30 bg-[var(--error)]/10 px-3 py-2 text-xs text-[var(--error)]">{error}</div>
           )}
 
         </div>
 
         {/* Right: results */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {result ? (
             <>
-              <div className="rounded-xl border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-4 py-3">
-                <p className="text-sm font-semibold text-[var(--accent)]">Segmentation complete</p>
-                <p className="mt-0.5 text-xs text-[var(--muted)]">
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3">
+                <p className="text-sm font-semibold text-[var(--success)]">Segmentation complete</p>
+                <p className="mt-1 text-xs text-[var(--muted)]">
                   {formatVoxels(result.vessel_voxels)} vessel voxels detected
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--muted)]">Input (axial)</p>
+                  <p className="mb-1.5 text-xs uppercase tracking-wider text-[var(--muted)]">Input (axial)</p>
                   <img
                     src={`data:image/png;base64,${result.preview_image}`}
                     alt="CTA axial slice"
-                    className="w-full rounded-xl border border-[var(--border)]/60"
+                    className="w-full rounded-xl border border-[var(--border)]"
                   />
                 </div>
                 <div>
-                  <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--muted)]">Vessel overlay</p>
+                  <p className="mb-1.5 text-xs uppercase tracking-wider text-[var(--muted)]">Vessel overlay</p>
                   <img
                     src={`data:image/png;base64,${result.overlay_image}`}
                     alt="Vessel segmentation overlay"
-                    className="w-full rounded-xl border border-[var(--border)]/60"
+                    className="w-full rounded-xl border border-[var(--border)]"
                   />
                 </div>
               </div>
@@ -205,28 +205,28 @@ export default function VesselSegmentationPage() {
               <div className="flex gap-2">
                 <button
                   onClick={downloadMask}
-                  className="flex-1 rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-3 py-2 text-xs font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
+                  className="flex-1 rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-3 py-2 text-xs font-medium text-[var(--accent)] transition hover:bg-[var(--accent)]/20"
                 >
                   Download 3D mask (.nii.gz)
                 </button>
                 <button
                   onClick={() => { setResult(null); setFile(null); }}
-                  className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs text-[var(--muted)] transition hover:text-[var(--text)]"
+                  className="rounded-xl border border-[var(--border)] px-3 py-2 text-xs text-[var(--muted)] transition hover:text-[var(--text)]"
                 >
                   New scan
                 </button>
               </div>
             </>
           ) : (
-            <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border)] text-center">
+            <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--border)] text-center">
               <p className="text-sm text-[var(--muted)]">Results will appear here</p>
-              <p className="text-xs text-[var(--muted)]/50">Upload a .nii.gz CTA scan and click Segment vessels</p>
+              <p className="text-xs text-[var(--muted)]">Upload a .nii.gz CTA scan and click Segment vessels</p>
             </div>
           )}
         </div>
       </div>
 
-      <p className="mt-6 text-[11px] text-[var(--muted)]/50">
+      <p className="mt-6 text-xs text-[var(--muted)]">
         StrokeChat · alceballosa/robust-vessel-segmentation · CC-BY-NC-SA 4.0 · not for clinical use.
       </p>
 

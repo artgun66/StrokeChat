@@ -348,25 +348,25 @@ export function ChatPane({
     >
       {dragActive && (
         <div
-          className="pointer-events-none absolute inset-3 z-30 flex items-center justify-center rounded-[2rem] border-2 border-dashed border-[var(--accent)] bg-[var(--accent-soft)]/60 backdrop-blur-md"
+          className="pointer-events-none absolute inset-3 z-30 flex items-center justify-center rounded-2xl border-2 border-dashed border-[var(--accent)] bg-[var(--accent-soft)]/60"
           aria-hidden
         >
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] px-5 py-4 text-sm font-semibold text-[var(--text)] shadow-xl shadow-slate-300">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] px-5 py-4 text-sm font-semibold text-[var(--text)] shadow-sm">
             Drop files to attach
           </div>
         </div>
       )}
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="flex flex-col gap-3 border-b border-[var(--border)]/80 bg-white/70 px-5 py-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:px-6">
+      <header className="flex flex-col gap-3 border-b border-[var(--border)] bg-[var(--bg-elevated)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:px-6">
         <div className="min-w-0">
           <p id={currentModelId} className="flex flex-wrap items-center gap-2 text-sm text-[var(--text)]">
-            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
+            <span className="rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">
               Active model
             </span>
-            <span className="font-bold">{modelSlug || "No local model selected"}</span>
+            <span className="font-semibold">{modelSlug || "No local model selected"}</span>
             {currentModelHasVision && (
-              <span className="inline-flex items-center rounded-full bg-[var(--accent)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm" title="This model accepts images">
+              <span className="inline-flex items-center rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-white" title="This model accepts images">
                 vision
               </span>
             )}
@@ -397,11 +397,11 @@ export function ChatPane({
       {/* ── Messages ───────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6">
         {messages.length === 0 ? (
-          <div className="mx-auto mt-10 max-w-2xl rounded-[2rem] border border-white/80 bg-white/80 p-8 text-center shadow-[var(--shadow-soft)] backdrop-blur md:p-10">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] text-base font-bold text-white shadow-lg shadow-blue-200">
+          <div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-8 text-center shadow-sm md:p-10">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-base font-semibold text-white">
               S
             </div>
-            <p className="text-lg font-bold text-[var(--text)]">How can StrokeChat help?</p>
+            <p className="text-lg font-semibold text-[var(--text)]">How can StrokeChat help?</p>
             <p className="mx-auto mt-3 max-w-lg text-balance text-sm leading-7 text-[var(--muted)]">
               Ask anything about stroke, or drop a CT brain scan image to get an
               AI-powered analysis with segmentation overlay. Follow-up questions
@@ -409,7 +409,7 @@ export function ChatPane({
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
               {emptyPrompts.map((hint) => (
-                <span key={hint} className="rounded-full border border-[var(--border)]/70 bg-white px-3 py-1.5 text-xs font-medium text-[var(--muted)] shadow-sm">
+                <span key={hint} className="rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium text-[var(--muted)]">
                   {hint}
                 </span>
               ))}
@@ -420,19 +420,19 @@ export function ChatPane({
             {messages.map((m, i) => (
               <li key={i} className={"flex items-start gap-3 " + (m.role === "user" ? "justify-end" : "justify-start")}>
                 {m.role !== "user" && (
-                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] text-xs font-bold text-white shadow-md shadow-blue-100">
+                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-[var(--accent)] text-xs font-semibold text-white">
                     {roleInitial(m.role)}
                   </div>
                 )}
                 <div className={
-                  "max-w-[min(86%,46rem)] rounded-[1.35rem] border px-4 py-3 text-sm shadow-sm " +
+                  "max-w-[min(86%,46rem)] rounded-2xl border px-4 py-3 text-sm " +
                   (m.role === "user"
-                    ? "border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 text-[var(--text)]"
+                    ? "border-blue-200 bg-blue-50 text-[var(--text)]"
                     : m.role === "assistant"
-                      ? "border-[var(--border)] bg-white/95 text-[var(--text)] shadow-slate-200"
-                      : "border-[var(--border)] bg-slate-50/90 text-[var(--muted)]")
+                      ? "border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text)]"
+                      : "border-[var(--border)] bg-[var(--panel-elevated)] text-[var(--muted)]")
                 }>
-                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">{roleLabel(m.role)}</p>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">{roleLabel(m.role)}</p>
 
                   {/* Uploaded image thumbnails */}
                   {m.attachedImages && m.attachedImages.length > 0 && (
@@ -477,17 +477,17 @@ export function ChatPane({
                           {/* Images */}
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <p className="mb-1 text-[9px] uppercase tracking-wider text-[var(--muted)]">Original</p>
+                              <p className="mb-1 text-xs uppercase tracking-wider text-[var(--muted)]">Original</p>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={`data:image/png;base64,${r.original_image}`} alt="Original CT" className="w-full rounded-lg" />
                             </div>
                             <div>
-                              <p className="mb-1 text-[9px] uppercase tracking-wider text-[var(--muted)]">Segmentation</p>
+                              <p className="mb-1 text-xs uppercase tracking-wider text-[var(--muted)]">Segmentation</p>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={`data:image/png;base64,${r.overlay_image}`} alt="Segmentation overlay" className="w-full rounded-lg" />
                             </div>
                           </div>
-                          <p className="mt-2 text-[10px] italic text-[var(--muted)]/70">
+                          <p className="mt-2 text-xs italic text-[var(--muted)]/70">
                             BiomedParse fine-tuned model · not for clinical use
                           </p>
                         </div>
@@ -513,17 +513,17 @@ export function ChatPane({
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <p className="mb-1 text-[9px] uppercase tracking-wider text-[var(--muted)]">CT axial slice</p>
+                              <p className="mb-1 text-xs uppercase tracking-wider text-[var(--muted)]">CT axial slice</p>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={`data:image/png;base64,${r.preview_image}`} alt="CT axial slice" className="w-full rounded-lg" />
                             </div>
                             <div>
-                              <p className="mb-1 text-[9px] uppercase tracking-wider text-[var(--muted)]">Vessel overlay</p>
+                              <p className="mb-1 text-xs uppercase tracking-wider text-[var(--muted)]">Vessel overlay</p>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={`data:image/png;base64,${r.overlay_image}`} alt="Vessel overlay" className="w-full rounded-lg" />
                             </div>
                           </div>
-                          <p className="mt-2 text-[10px] italic text-[var(--muted)]/70">
+                          <p className="mt-2 text-xs italic text-[var(--muted)]/70">
                             nnUNet robust-vessel-segmentation · not for clinical use
                           </p>
                         </div>

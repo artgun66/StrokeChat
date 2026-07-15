@@ -14,8 +14,8 @@ export function NavLink({ href, children }: { href: string; children: React.Reac
       className={
         "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 " +
         (active
-          ? "bg-white text-[var(--accent)] shadow-sm ring-1 ring-slate-200"
-          : "text-[var(--muted)] hover:bg-white/80 hover:text-[var(--text)]")
+          ? "bg-[var(--bg-elevated)] text-[var(--accent)] ring-1 ring-[var(--border)]"
+          : "text-[var(--muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text)]")
       }
     >
       {children}

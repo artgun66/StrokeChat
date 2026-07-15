@@ -65,17 +65,17 @@ export default function ModelsPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-5 md:px-6">
-      <div className="border-b border-[var(--border)]/80 pb-4">
-        <h1 className="text-lg font-semibold tracking-tight text-[var(--text)] md:text-xl">
+      <div className="border-b border-[var(--border)] pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-[var(--text)]">
           Installed models
         </h1>
-        <p className="mt-1 text-xs leading-snug text-[var(--muted)]">
+        <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">
           Weight files on this runtime used by Chat.{" "}
           <span className="text-[var(--text)]/80">
             {items.length} file{items.length === 1 ? "" : "s"} on disk.
           </span>{" "}
           Paths under{" "}
-          <code className="rounded border border-[var(--border)] bg-slate-100 px-1 py-0.5 text-[10px] text-[var(--text)]">
+          <code className="rounded border border-[var(--border)] bg-[var(--panel-elevated)] px-1 py-0.5 text-xs text-[var(--text)]">
             $DATA_DIR/models/&lt;slug&gt;/
           </code>
         </p>
@@ -93,13 +93,13 @@ export default function ModelsPage() {
           to download a model.
         </p>
       ) : (
-        <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--panel)] shadow-sm shadow-slate-200">
+        <div className="mt-6 overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--panel)] shadow-sm">
           <table className="w-full min-w-[680px] table-fixed border-collapse text-left text-sm">
             <caption className="sr-only">
               Installed model files: size, status, path, checksum, last updated
             </caption>
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[var(--panel-elevated)]/90 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+              <tr className="border-b border-[var(--border)] bg-[var(--panel-elevated)] text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                 <th className="w-[18%] px-3 py-2 font-medium">Model</th>
                 <th className="w-[10%] px-2 py-2 font-medium">Size</th>
                 <th className="w-[12%] px-2 py-2 font-medium">Status</th>
@@ -120,7 +120,7 @@ export default function ModelsPage() {
                     </div>
                     {m.status === "failed" && m.error ? (
                       <p
-                        className="mt-1 line-clamp-2 text-[10px] leading-snug text-[var(--error)]"
+                        className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--error)]"
                         title={m.error}
                       >
                         {m.error}
@@ -133,7 +133,7 @@ export default function ModelsPage() {
                   <td className="px-2 py-1.5 align-top">
                     <span
                       className={
-                        "inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium capitalize " +
+                        "inline-block rounded border px-1.5 py-0.5 text-xs font-medium capitalize " +
                         statusClass(m.status)
                       }
                     >
@@ -141,18 +141,18 @@ export default function ModelsPage() {
                     </span>
                   </td>
                   <td
-                    className="max-w-0 px-2 py-1.5 align-top text-[10px] font-mono text-[var(--muted)]"
+                    className="max-w-0 px-2 py-1.5 align-top text-xs font-mono text-[var(--muted)]"
                     title={m.local_path}
                   >
                     <span className="line-clamp-2 break-all">{m.local_path}</span>
                   </td>
                   <td
-                    className="px-2 py-1.5 align-top font-mono text-[10px] text-[var(--muted)]"
+                    className="px-2 py-1.5 align-top font-mono text-xs text-[var(--muted)]"
                     title={m.sha256}
                   >
                     {m.sha256.slice(0, 14)}…
                   </td>
-                  <td className="whitespace-nowrap px-3 py-1.5 text-right align-top text-[10px] tabular-nums text-[var(--muted)]">
+                  <td className="whitespace-nowrap px-3 py-1.5 text-right align-top text-xs tabular-nums text-[var(--muted)]">
                     {formatShortDate(m.updated_at)}
                   </td>
                 </tr>

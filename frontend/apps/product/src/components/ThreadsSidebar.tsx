@@ -56,20 +56,20 @@ export function ThreadsSidebar({ activeId }: Props) {
   }
 
   return (
-    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-[var(--border)]/80 bg-white/65 backdrop-blur-xl">
-      <div className="border-b border-[var(--border)]/80 p-3">
+    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-[var(--border)] bg-[var(--bg-elevated)]">
+      <div className="border-b border-[var(--border)] p-3">
         <div className="mb-3 flex items-center justify-between px-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
             Conversations
           </p>
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-[var(--muted)]">
+          <span className="rounded-full bg-[var(--panel-elevated)] px-2 py-0.5 text-xs font-medium text-[var(--muted)]">
             {threads.length}
           </span>
         </div>
         <button
           onClick={newThread}
           disabled={busy}
-          className="w-full rounded-2xl bg-gradient-to-b from-[var(--accent)] to-[#1d4ed8] px-3 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-200 ring-1 ring-blue-300/50 transition hover:-translate-y-0.5 hover:shadow-xl disabled:translate-y-0 disabled:opacity-50"
+          className="w-full rounded-xl bg-[var(--accent)] px-3 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
         >
           {busy ? "Starting…" : "New chat"}
         </button>

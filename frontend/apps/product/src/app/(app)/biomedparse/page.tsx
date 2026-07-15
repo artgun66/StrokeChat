@@ -103,12 +103,12 @@ function AspectsScorer({
       {/* Score header */}
       <div className="mb-3 flex items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">ASPECTS</p>
-          <p className="mt-0.5 text-4xl font-bold tabular-nums text-[var(--text)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">ASPECTS</p>
+          <p className="mt-1 text-4xl font-semibold tabular-nums text-[var(--text)]">
             {displayScore}
             <span className="ml-1 text-base font-normal text-[var(--muted)]">/ 10</span>
           </p>
-          <p className="mt-0.5 text-[11px] text-[var(--muted)]">
+          <p className="mt-1 text-xs text-[var(--muted)]">
             Alberta Stroke Program Early CT Score
           </p>
         </div>
@@ -129,11 +129,11 @@ function AspectsScorer({
       </div>
 
       {/* AI estimated score callout */}
-      <div className="mb-3 flex items-center gap-2 rounded-lg border border-[var(--border)] bg-slate-50 px-3 py-2">
-        <svg className="h-3.5 w-3.5 shrink-0 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="mb-4 flex items-center gap-2 rounded-lg bg-[var(--panel-elevated)] px-3 py-2">
+        <svg className="h-3.5 w-3.5 shrink-0 text-[var(--muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082" />
         </svg>
-        <p className="text-[11px] text-[var(--muted)]">
+        <p className="text-xs text-[var(--muted)]">
           AI estimated ASPECTS: <span className="font-semibold text-[var(--text)]">{aiScore}/10</span>
           <span className="ml-1 text-[var(--muted)]/70">(based on lesion area — mark regions below to refine)</span>
         </p>
@@ -146,13 +146,13 @@ function AspectsScorer({
       </div>
 
       {/* Formula explanation */}
-      <p className="mb-3 text-[11px] text-[var(--muted)]/70">
+      <p className="mb-4 text-xs text-[var(--muted)]/70">
         ASPECTS = 10 − affected regions · click each region to mark as affected (−1 each)
       </p>
 
       {/* Subcortical structures: C, L, IC (3) */}
       <div className="mb-2">
-        <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[var(--muted)]/60">
+        <p className="mb-1.5 text-xs uppercase tracking-widest text-[var(--muted)]/60">
           Subcortical structures
         </p>
         <div className="grid grid-cols-3 gap-1.5">
@@ -167,8 +167,8 @@ function AspectsScorer({
                   : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]/40 hover:bg-slate-50"
               }`}
             >
-              <span className="text-sm font-bold leading-none">{r.label}</span>
-              <span className="mt-0.5 text-[9px] leading-tight opacity-60">{r.full}</span>
+              <span className="text-sm font-semibold leading-none">{r.label}</span>
+              <span className="mt-0.5 text-[11px] leading-tight opacity-60">{r.full}</span>
             </button>
           ))}
         </div>
@@ -176,11 +176,11 @@ function AspectsScorer({
 
       {/* MCA cortex: I (insular) + M1–M6 (7 total) */}
       <div>
-        <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[var(--muted)]/60">
+        <p className="mb-1.5 text-xs uppercase tracking-widest text-[var(--muted)]/60">
           MCA cortex
         </p>
         {/* Ganglionic level: I, M1, M2, M3 */}
-        <p className="mb-1 text-[9px] text-[var(--muted)]/50">Ganglionic level</p>
+        <p className="mb-1 text-xs text-[var(--muted)]/50">Ganglionic level</p>
         <div className="mb-1.5 grid grid-cols-4 gap-1.5">
           {cortical.slice(0, 4).map(r => (
             <button
@@ -193,13 +193,13 @@ function AspectsScorer({
                   : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]/40 hover:bg-slate-50"
               }`}
             >
-              <span className="text-sm font-bold leading-none">{r.label}</span>
-              <span className="mt-0.5 text-[9px] leading-tight opacity-60 px-0.5">{r.full}</span>
+              <span className="text-sm font-semibold leading-none">{r.label}</span>
+              <span className="mt-0.5 text-[11px] leading-tight opacity-60 px-0.5">{r.full}</span>
             </button>
           ))}
         </div>
         {/* Supraganglionic: M4, M5, M6 */}
-        <p className="mb-1 text-[9px] text-[var(--muted)]/50">Supraganglionic level</p>
+        <p className="mb-1 text-xs text-[var(--muted)]/50">Supraganglionic level</p>
         <div className="grid grid-cols-3 gap-1.5">
           {cortical.slice(4).map(r => (
             <button
@@ -212,8 +212,8 @@ function AspectsScorer({
                   : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--accent)]/40 hover:bg-slate-50"
               }`}
             >
-              <span className="text-sm font-bold leading-none">{r.label}</span>
-              <span className="mt-0.5 text-[9px] leading-tight opacity-60 px-1">{r.full}</span>
+              <span className="text-sm font-semibold leading-none">{r.label}</span>
+              <span className="mt-0.5 text-[11px] leading-tight opacity-60 px-1">{r.full}</span>
             </button>
           ))}
         </div>
@@ -221,25 +221,25 @@ function AspectsScorer({
 
       {/* Affected list */}
       {affected.size > 0 && (
-        <p className="mt-2 text-[11px] text-red-600">
+        <p className="mt-3 text-xs text-red-600">
           Affected: {Array.from(affected).join(", ")} (−{affected.size} → manual score {manualScore}/10)
         </p>
       )}
 
       {/* AI metrics */}
-      <div className="mt-3 border-t border-[var(--border)]/40 pt-3 flex gap-4">
+      <div className="mt-4 border-t border-[var(--border)] pt-4 flex gap-4">
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]/60">AI confidence</p>
+          <p className="text-xs uppercase tracking-wider text-[var(--muted)]/60">AI confidence</p>
           <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--text)]">{(confidence * 100).toFixed(1)}%</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]/60">Lesion area</p>
+          <p className="text-xs uppercase tracking-wider text-[var(--muted)]/60">Lesion area</p>
           <p className="mt-0.5 text-sm font-semibold tabular-nums text-[var(--text)]">{maskAreaPct.toFixed(2)}%</p>
         </div>
         {affected.size > 0 && (
           <button
             onClick={() => setAffected(new Set())}
-            className="ml-auto self-end rounded px-2 py-1 text-[10px] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)]/50 transition"
+            className="ml-auto self-end rounded px-2 py-1 text-xs text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)] transition"
           >
             Reset
           </button>
@@ -278,7 +278,7 @@ function SliceCard({ result, index }: { result: SliceResult; index: number }) {
       {/* Slice label + verdict */}
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium text-[var(--muted)]">Slice {index + 1} — {result.filename}</p>
-        <span className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+        <span className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
           result.detected
             ? "border border-red-200 bg-red-50 text-red-700"
             : "border border-green-200 bg-green-50 text-green-700"
@@ -291,11 +291,11 @@ function SliceCard({ result, index }: { result: SliceResult; index: number }) {
       {/* Images */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--muted)]">Original</p>
+          <p className="mb-1 text-xs uppercase tracking-wider text-[var(--muted)]">Original</p>
           <img src={`data:image/png;base64,${result.original_image}`} alt="Original" className="w-full rounded-lg border border-[var(--border)]/60" />
         </div>
         <div>
-          <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--muted)]">AI Segmentation</p>
+          <p className="mb-1 text-xs uppercase tracking-wider text-[var(--muted)]">AI Segmentation</p>
           <img src={`data:image/png;base64,${result.overlay_image}`} alt="Overlay" className="w-full rounded-lg border border-[var(--border)]/60" />
         </div>
       </div>
@@ -414,12 +414,12 @@ export default function BiomedParsePage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-[var(--text)]">CT Scan Analysis</h1>
-          <p className="mt-0.5 text-sm text-[var(--muted)]">
+          <h1 className="text-xl font-semibold tracking-tight text-[var(--text)]">CT Scan Analysis</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
             BiomedParse segmentation · interactive ASPECTS scoring · up to 12 slices
           </p>
         </div>
-        <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--muted)]">
+        <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
           Research only
         </span>
       </div>
@@ -447,7 +447,7 @@ export default function BiomedParsePage() {
           <p className="text-sm text-[var(--muted)]">
             {files.length ? `${files.length} slice${files.length > 1 ? "s" : ""} — add more` : <>Drop slices or <span className="text-[var(--accent)]">browse</span></>}
           </p>
-          <p className="text-[11px] text-[var(--muted)]/50">PNG, JPEG, DICOM · up to 12 images</p>
+          <p className="text-xs text-[var(--muted)]/50">PNG, JPEG, DICOM · up to 12 images</p>
           <input
             ref={inputRef} type="file" accept="image/*,.dcm" multiple className="hidden"
             onChange={(e) => { if (e.target.files?.length) addFiles(e.target.files); }}
@@ -491,13 +491,13 @@ export default function BiomedParsePage() {
             <div key={i} className="group relative">
               {previews[i]
                 ? <img src={previews[i]!} alt={f.name} className="h-16 w-16 rounded-lg border border-[var(--border)]/60 object-cover" />
-                : <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-[var(--border)] bg-slate-100 text-[10px] text-[var(--muted)]">DCM</div>
+                : <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel-elevated)] text-xs text-[var(--muted)]">DCM</div>
               }
               <button
                 onClick={() => removeFile(i)}
                 className="absolute -right-1.5 -top-1.5 hidden h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white group-hover:flex"
               >×</button>
-              <p className="mt-0.5 max-w-[64px] truncate text-[9px] text-[var(--muted)]/60">{f.name}</p>
+              <p className="mt-0.5 max-w-[64px] truncate text-xs text-[var(--muted)]/60">{f.name}</p>
             </div>
           ))}
         </div>
@@ -565,7 +565,7 @@ export default function BiomedParsePage() {
         </button>
       )}
 
-      <p className="mt-6 text-[11px] text-[var(--muted)]/50">
+      <p className="mt-8 text-xs text-[var(--muted)]/50">
         StrokeChat · research prototype · not for clinical diagnosis or treatment.
       </p>
     </main>

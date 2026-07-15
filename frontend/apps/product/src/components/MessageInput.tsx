@@ -416,10 +416,10 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
     (draft.trim().length > 0 || attachments.length > 0);
 
   return (
-    <footer className="border-t border-[var(--border)]/80 bg-white/75 p-3 backdrop-blur-xl md:p-4">
+    <footer className="border-t border-[var(--border)] bg-[var(--bg-elevated)] p-3 md:p-4">
       <div className="mx-auto max-w-4xl">
         {(attachments.length > 0 || pendingPdfs > 0 || attachError) && (
-          <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[var(--border)]/70 bg-white/70 p-2 shadow-sm">
+          <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-2 shadow-sm">
             {attachments.map((a, i) =>
               a.kind === "image" ? (
                 <span
@@ -453,7 +453,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
                   </svg>
                   <span className="max-w-[140px] truncate">{a.name}</span>
                   <span className="text-cyan-600">{formatBytes(a.size)}</span>
-                  <span className="rounded bg-cyan-100 px-1 text-[9px] uppercase tracking-wide text-cyan-700">CTA</span>
+                  <span className="rounded bg-cyan-100 px-1 text-xs uppercase tracking-wide text-cyan-700">CTA</span>
                   <button
                     type="button"
                     onClick={() => removeAttachment(i)}
@@ -507,7 +507,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
           </div>
         )}
 
-        <div className="rounded-[1.6rem] border border-[var(--border)] bg-white p-2 shadow-lg shadow-slate-200/80 transition focus-within:border-[var(--accent)]/40 focus-within:shadow-xl">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-2 shadow-sm transition focus-within:border-[var(--accent)]/40">
           <div className="flex items-end gap-2">
           {/* Attach */}
           <button
@@ -600,7 +600,7 @@ export const MessageInput = forwardRef<MessageInputHandle, Props>(function Messa
           <Button
             onClick={handleSend}
             disabled={!canSend}
-            className="h-11 shrink-0 rounded-2xl bg-gradient-to-b from-[var(--accent)] to-blue-700 px-5 font-bold shadow-md shadow-blue-200 transition hover:-translate-y-0.5 hover:brightness-110 disabled:translate-y-0 disabled:shadow-none"
+            className="h-11 shrink-0 rounded-2xl bg-[var(--accent)] px-5 font-semibold transition hover:brightness-110"
           >
             {disabled
               ? "Thinking..."

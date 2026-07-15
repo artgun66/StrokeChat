@@ -25,14 +25,14 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className={`h-full min-h-0 antialiased ${fontSans.className}`}>
         <div className="mx-auto flex h-full min-h-0 w-full max-w-[1500px] flex-col px-0 sm:px-3">
-          <header className="z-20 grid min-h-[4.5rem] shrink-0 grid-cols-1 gap-3 border-b border-[var(--border)]/80 bg-[var(--panel-glass)] px-4 py-3 shadow-sm backdrop-blur-xl sm:mt-3 sm:rounded-3xl sm:border sm:px-5 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-4 md:py-0">
+          <header className="z-20 grid min-h-[4.5rem] shrink-0 grid-cols-1 gap-3 border-b border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3 sm:mt-3 sm:rounded-2xl sm:border sm:px-5 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-4 md:py-0">
             <Link
               href="/"
               className="group min-w-0 justify-self-start rounded-2xl px-1 py-0.5 transition hover:bg-slate-100/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2"
             >
               <div className="flex items-center gap-2.5">
                 <span
-                  className="relative h-9 w-9 shrink-0 overflow-hidden rounded-2xl border border-white/80 bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] shadow-lg shadow-blue-200"
+                  className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)]"
                   aria-hidden
                 >
                   <span className="absolute inset-x-2 top-2 h-1.5 rounded-full bg-white/70" />
@@ -49,7 +49,7 @@ export default function RootLayout({
               </div>
             </Link>
             <nav
-              className="flex min-w-0 items-center justify-start gap-1 overflow-x-auto rounded-full border border-slate-200/80 bg-slate-50/80 p-1 shadow-inner shadow-white md:justify-self-center"
+              className="flex min-w-0 items-center justify-start gap-1 overflow-x-auto rounded-full border border-[var(--border)] bg-[var(--bg)] p-1 md:justify-self-center"
               aria-label="Main"
             >
               <NavLink href="/threads">Chat</NavLink>
@@ -57,7 +57,7 @@ export default function RootLayout({
               <NavLink href="/vessel-segmentation">Vessels</NavLink>
             </nav>
             <div
-              className="hidden justify-self-end rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-right text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700 md:block"
+              className="hidden justify-self-end rounded-full border border-[var(--border)] px-3 py-1 text-right text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)] md:block"
               aria-hidden
             >
               Research only

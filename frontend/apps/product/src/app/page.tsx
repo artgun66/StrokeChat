@@ -43,29 +43,27 @@ export default async function Page() {
     <main className="mx-auto max-w-6xl px-5 py-10 md:px-10 md:py-16">
 
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <div className="relative mb-10 overflow-hidden rounded-[2rem] border border-white/80 bg-[var(--panel-glass)] p-7 shadow-[var(--shadow-soft)] backdrop-blur-xl md:p-10">
-        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[var(--accent)]/10 blur-3xl" aria-hidden />
-        <div className="absolute bottom-0 right-8 hidden h-28 w-44 rounded-t-full border border-cyan-200/70 bg-cyan-50/70 md:block" aria-hidden />
-        <div className="relative max-w-3xl">
-          <h1 className="text-4xl font-bold tracking-tight text-[var(--text)] md:text-6xl">
+      <div className="mb-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-8 md:p-12">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-[var(--text)] md:text-6xl">
             Understand stroke findings with{" "}
-            <span className="bg-gradient-to-r from-[var(--accent-2)] via-[var(--accent)] to-blue-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--accent-2)] to-[var(--accent)] bg-clip-text text-transparent">
               guided AI analysis
             </span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--muted)] md:text-lg">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
             Ask clinical questions, analyse CT slices, and segment CTA vessels in a local-first research prototype designed for careful exploration.
           </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               href="/threads"
-              className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-b from-[var(--accent)] to-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:shadow-xl"
+              className="inline-flex items-center justify-center rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
               Start a chat
             </a>
             <a
               href="/biomedparse"
-              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-[var(--text)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)]/30"
+              className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-5 py-3 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--accent)]"
             >
               Analyse CT scan
             </a>
@@ -74,18 +72,18 @@ export default async function Page() {
       </div>
 
       {/* ── Combined card ──────────────────────────────────────────────────── */}
-      <div className="rounded-[1.75rem] border border-white/80 bg-[var(--panel-glass)] p-5 shadow-lg shadow-slate-200/70 backdrop-blur md:p-6">
-        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">What you can do</p>
-        <div className="grid gap-3 md:grid-cols-3">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6">
+        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">What you can do</p>
+        <div className="grid gap-6 md:grid-cols-3">
           {CAPABILITIES.map((c) => (
-            <a key={c.href} href={c.href} className="group rounded-2xl border border-[var(--border)]/70 bg-white/75 p-4 transition hover:-translate-y-0.5 hover:border-[var(--accent)]/30 hover:shadow-lg hover:shadow-slate-200">
-              <div className={`mb-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${c.accent} text-white shadow-md`}>
+            <a key={c.href} href={c.href} className="group rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 transition hover:border-[var(--accent)]">
+              <div className="mb-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--panel-elevated)] text-[var(--accent)]">
                 {c.icon}
               </div>
               <div className="flex min-h-32 flex-col">
-                <p className="text-sm font-bold text-[var(--text)]">{c.title}</p>
-                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{c.description}</p>
-                <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-xs font-bold text-[var(--accent)]">
+                <p className="text-sm font-semibold text-[var(--text)]">{c.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{c.description}</p>
+                <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-xs font-semibold text-[var(--accent)]">
                   {c.cta}
                   <svg className="h-3 w-3 transition group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -98,16 +96,16 @@ export default async function Page() {
       </div>
 
       {/* ── Desktop download ───────────────────────────────────────────────── */}
-      <div className="mt-8 rounded-[1.75rem] border border-white/80 bg-[var(--panel-glass)] p-6 shadow-lg shadow-slate-200/70 backdrop-blur">
-        <div className="mb-4 flex items-start justify-between gap-4">
+      <div className="mt-8 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6">
+        <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Run locally</p>
             <p className="mt-1 text-base font-semibold text-[var(--text)]">Download the desktop app</p>
-            <p className="mt-0.5 text-sm text-[var(--muted)]">
+            <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
               Run StrokeChat fully offline — all inference on your own hardware, no account needed.
             </p>
           </div>
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-white/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border)]">
             <svg className="h-5 w-5 text-[var(--text)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round"
                 d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3" />
@@ -120,7 +118,7 @@ export default async function Page() {
           <a
             href="https://github.com/artgun66/StrokeChat/releases/latest/download/StrokeChat-mac-arm64.dmg"
             download
-            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
+            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3.5 transition hover:border-[var(--accent)]"
           >
             <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -138,7 +136,7 @@ export default async function Page() {
           <a
             href="https://github.com/artgun66/StrokeChat/releases/latest/download/StrokeChat-mac-x64.dmg"
             download
-            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
+            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3.5 transition hover:border-[var(--accent)]"
           >
             <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -156,7 +154,7 @@ export default async function Page() {
           <a
             href="https://github.com/artgun66/StrokeChat/releases/latest/download/StrokeChat-win-x64-setup.exe"
             download
-            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3.5 transition hover:border-[var(--accent)]/40 hover:bg-white/[0.06]"
+            className="group flex flex-1 items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3.5 transition hover:border-[var(--accent)]"
           >
             <svg className="h-7 w-7 shrink-0 text-[var(--text)]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 12V6.75l6-1.32v6.57H3zm17 0V5.25L10 3v9h10zm0 .75V18.75L10 21v-9h10zM3 18.75v-6H9v6.42l-6-1.32z"/>
@@ -171,9 +169,9 @@ export default async function Page() {
           </a>
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-4 flex items-center gap-2">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
-          <p className="text-[11px] text-[var(--muted)]/70">
+          <p className="text-xs text-[var(--muted)]">
             First build in progress — downloads will be ready shortly.
             <a href="https://github.com/artgun66/StrokeChat/releases" target="_blank" rel="noopener noreferrer"
               className="ml-1 text-[var(--accent)] hover:underline">
@@ -181,13 +179,13 @@ export default async function Page() {
             </a>
           </p>
         </div>
-        <p className="mt-1 text-[11px] text-[var(--muted)]/50">
+        <p className="mt-2 text-xs text-[var(--muted)]">
           GPU with ≥ 8 GB VRAM recommended · macOS 13+ or Windows 10+
         </p>
       </div>
 
       {/* ── Disclaimer ─────────────────────────────────────────────────────── */}
-      <p className="mt-8 text-[11px] leading-relaxed text-[var(--muted)]/50">
+      <p className="mt-8 text-xs leading-relaxed text-[var(--muted)]">
         StrokeChat &mdash; research prototype by Artun Gunturkun, Henry M. Gunn High School, Palo Alto.
         Not intended for clinical diagnosis or treatment. Always consult a qualified physician.
       </p>

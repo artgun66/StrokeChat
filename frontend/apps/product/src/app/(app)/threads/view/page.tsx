@@ -66,7 +66,7 @@ function ThreadViewRoute() {
 
   if (!data) {
     return (
-      <div className="flex h-full bg-black/10">
+      <div className="flex h-full bg-[var(--bg)]">
         <ThreadsSidebar activeId={id ?? undefined} />
         <main className="flex flex-1 items-center justify-center p-6">
           <p className="text-sm text-[var(--muted)]">Loading conversation…</p>
@@ -76,7 +76,7 @@ function ThreadViewRoute() {
   }
 
   return (
-    <div className="flex h-full bg-black/10">
+    <div className="flex h-full bg-[var(--bg)]">
       <ThreadsSidebar activeId={data.thread.id} />
       <main className="flex-1">
         <ThreadView
