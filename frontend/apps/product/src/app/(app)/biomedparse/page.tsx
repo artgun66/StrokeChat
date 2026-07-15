@@ -419,7 +419,7 @@ export default function BiomedParsePage() {
             BiomedParse segmentation · interactive ASPECTS scoring · up to 12 slices
           </p>
         </div>
-        <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-amber-700">
+        <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-[var(--muted)]">
           Research only
         </span>
       </div>
@@ -529,7 +529,7 @@ export default function BiomedParsePage() {
 
       {/* Explore in chat CTA */}
       {results.length > 0 && (
-        <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-[var(--accent)]/30 bg-[var(--accent)]/5 px-4 py-3">
+        <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-white px-4 py-3">
           <div>
             <p className="text-sm font-medium text-[var(--text)]">Explore further with our AI chat models</p>
             <p className="text-xs text-[var(--muted)]">Send these results and CT images directly to MedGemma for clinical interpretation</p>

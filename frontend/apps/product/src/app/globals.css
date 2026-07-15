@@ -56,13 +56,8 @@ body {
 }
 
 body {
-  background:
-    radial-gradient(ellipse 980px 560px at -10% -10%,
-      color-mix(in oklab, var(--accent) 10%, transparent), transparent 58%),
-    radial-gradient(ellipse 720px 420px at 105% 0%,
-      color-mix(in oklab, var(--accent-2) 10%, transparent), transparent 54%),
-    linear-gradient(180deg, color-mix(in oklab, #ffffff 72%, transparent), transparent 28%),
-    var(--bg);
+  /* Flat, clean surface — no decorative gradients (Biomni-style minimal) */
+  background: var(--bg);
   color: var(--text);
 }
 
