@@ -142,6 +142,29 @@ function AspectsScorer({
         )}
       </div>
 
+      {/* How the score was calculated — shown once scored */}
+      {scored && (
+        <p className="mb-3 text-xs leading-relaxed text-[var(--muted)]">
+          {affected.size > 0 ? (
+            <>
+              Calculated as{" "}
+              <span className="font-semibold text-[var(--text)]">
+                10 − {affected.size} affected region{affected.size > 1 ? "s" : ""}
+              </span>{" "}
+              ({Array.from(affected).join(", ")}) ={" "}
+              <span className="font-semibold text-[var(--text)]">{score}</span>. Each region
+              with early ischemic change subtracts 1 point from a normal score of 10.
+            </>
+          ) : (
+            <>
+              Recorded as{" "}
+              <span className="font-semibold text-[var(--text)]">10</span> — no regions marked
+              with early ischemic change, so no points are subtracted from the normal score of 10.
+            </>
+          )}
+        </p>
+      )}
+
       {/* Not-yet-scored prompt — never a fabricated or default number */}
       {!scored && (
         <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5">
@@ -241,13 +264,6 @@ function AspectsScorer({
           ))}
         </div>
       </div>
-
-      {/* Affected list */}
-      {affected.size > 0 && (
-        <p className="mt-3 text-xs text-red-600">
-          Affected: {Array.from(affected).join(", ")} (−{affected.size} → ASPECTS {score}/10)
-        </p>
-      )}
 
       {/* Model measurements — supporting data, explicitly NOT the ASPECTS score */}
       <div className="mt-4 border-t border-[var(--border)] pt-4 flex gap-4">
