@@ -184,16 +184,19 @@ def segment(item: dict):
         round(float(np.sum(pred_mask > 0)) / (512 * 512) * 100, 2)
         if pred_mask is not None else 0.0
     )
-    # Aspect score (0–10): 70% detection confidence + 30% lesion coverage
-    # Coverage component saturates at 5% of image area (typical large lesion)
-    coverage_component = min(mask_area_pct / 5.0, 1.0)
-    aspect_score = round(float(prob) * 7.0 + coverage_component * 3.0, 1)
-
+    # NOTE: We deliberately do NOT compute or return an "ASPECTS" number here.
+    # ASPECTS is a TOPOGRAPHIC score (10 minus the count of MCA-territory regions
+    # showing early ischemic change), assessed across two standardized axial
+    # levels (ganglionic + supraganglionic) with per-region anatomical
+    # attribution. A single axial slice plus a lesion mask cannot yield a valid
+    # ASPECTS, and inferring one from lesion area would be fabricating a clinical
+    # number — unsafe for the clinicians who rely on it. Instead we return only
+    # the model's genuine measurements (detection + lesion coverage); the
+    # clinician computes ASPECTS by marking the affected regions in the UI.
     return {
         "detected": bool(detected),
         "confidence": round(float(prob), 4),
         "mask_area_pct": mask_area_pct,
-        "aspect_score": aspect_score,
         "prompt": str(full_prompt),
         "overlay_image": _b64(overlay),
         "original_image": _b64(orig),
