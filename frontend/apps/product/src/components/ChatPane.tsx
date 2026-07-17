@@ -64,10 +64,17 @@ function dataUrlToBlob(dataUrl: string): Blob {
   return new Blob([arr], { type: mime });
 }
 
-function detectTarget(text: string): "bleeding" | "stroke" {
+// Decide which BiomedParse targets to run for a dropped image. If the user's
+// message clearly asks for one (e.g. "check for bleeding"), run just that; if it
+// says nothing specific — the common case of dropping an image into chat — run
+// BOTH hemorrhage and ischemic so neither is silently skipped.
+function detectTargets(text: string): ("bleeding" | "stroke")[] {
   const lc = text.toLowerCase();
-  if (lc.includes("stroke") || lc.includes("ischemic")) return "stroke";
-  return "bleeding";
+  const mentionsStroke = lc.includes("stroke") || lc.includes("ischemic") || lc.includes("ischaemic") || lc.includes("infarct");
+  const mentionsBleed = lc.includes("bleed") || lc.includes("hemorrhage") || lc.includes("haemorrhage") || lc.includes("blood");
+  if (mentionsStroke && !mentionsBleed) return ["stroke"];
+  if (mentionsBleed && !mentionsStroke) return ["bleeding"];
+  return ["bleeding", "stroke"];
 }
 
 async function runBiomedParse(img: ImageAttachment, target: "bleeding" | "stroke"): Promise<BiomedResult | null> {
@@ -183,8 +190,10 @@ export function ChatPane({
     // ── 1a. Run BiomedParse on every image ─────────────────────────────────
     let biomedResults: BiomedResult[] = [];
     if (images.length > 0) {
-      const target = detectTarget(text);
-      const settled = await Promise.all(images.map((img) => runBiomedParse(img, target)));
+      const targets = detectTargets(text);
+      const settled = await Promise.all(
+        images.flatMap((img) => targets.map((t) => runBiomedParse(img, t))),
+      );
       biomedResults = settled.filter((r): r is BiomedResult => r !== null);
 
       setMessages((prev) => {
