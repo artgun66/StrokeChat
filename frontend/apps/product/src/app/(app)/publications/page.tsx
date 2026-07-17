@@ -45,21 +45,21 @@ export default function PublicationsPage() {
         <div className="mt-5 border-t border-[var(--border)] pt-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Abstract</p>
           <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-            Stroke is the second leading cause of death worldwide, and rapid differentiation of
-            ischemic from hemorrhagic stroke on CT is critical because the two demand
-            fundamentally different treatments. We fine-tune BiomedParse — a biomedical
-            foundation model pretrained across nine imaging modalities — for stroke detection and
-            segmentation on non-contrast head CT, and benchmark it against zero-shot Gemini 2.5 Pro
-            and GPT-5. Training uses the Teknofest-2021 Stroke Dataset (6,650 expert-annotated
-            axial non-contrast CT slices from the Turkish Ministry of Health, 2019–2020), with the
-            prompts &ldquo;stroke is present&rdquo;, &ldquo;bleeding is present&rdquo;, and
-            &ldquo;normal and healthy&rdquo;. The fine-tuned model attains 95.2% accuracy and 85.8%
-            F1 for ischemic stroke and 98.9% accuracy and 96.5% F1 for hemorrhage, substantially
-            outperforming both general-purpose multimodal models: GPT-5 missed 97.3% of ischemic
-            cases, while Gemini 2.5 Pro showed poor specificity and high false-alarm rates. Unlike
-            single-task CNNs, BiomedParse produces pixel-level lesion masks alongside
-            classification, enabling both triage and lesion delineation from a single model, and
-            its broad pretraining yields strong performance under medical data scarcity.
+            Fast and accurate differentiation between ischemic and hemorrhagic stroke on computed
+            tomography (CT) is critical for timely treatment decisions. While deep learning models
+            such as CNNs and U-Nets have shown promise, they struggle with the irregular boundaries
+            of early stroke findings and require large labeled datasets. Vision-language models
+            (VLMs), integrating semantic medical knowledge with visual understanding, may overcome
+            these limitations. In this study, we fine-tuned BiomedParse, a biomedical VLM, on the
+            Teknofest-2021 Stroke Dataset (6,650 CT slices). We evaluated the fine-tuned model on
+            ischemic and hemorrhagic stroke detection and compared its performance with zero-shot
+            Gemini 2.5 Pro and GPT-5. The fine-tuned model achieved accuracy of 95.2% and F1 score
+            of 85.8% for ischemic stroke detection, and accuracy of 98.9% and F1 score of 96.5% for
+            hemorrhagic stroke detection, substantially outperforming both general-purpose
+            multimodal models. Our results demonstrate that domain-specific fine-tuning of
+            biomedical foundation models provides a scalable and high-performing approach to medical
+            image analysis, while general large language models require domain-specific adaptation
+            to perform reliably on such tasks.
           </p>
         </div>
 
