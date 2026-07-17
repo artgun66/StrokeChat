@@ -51,9 +51,9 @@ export default async function Page() {
       <div className="mb-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-8 md:p-12">
         <div className="max-w-3xl">
           <h1 className="text-4xl font-semibold tracking-tight text-[var(--text)] md:text-6xl">
-            Stroke-imaging AI, made{" "}
+            Understand stroke findings with{" "}
             <span className="bg-gradient-to-r from-[var(--accent-2)] to-[var(--accent)] bg-clip-text text-transparent">
-              usable for clinicians
+              guided AI analysis
             </span>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
