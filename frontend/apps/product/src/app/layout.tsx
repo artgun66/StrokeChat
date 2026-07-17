@@ -31,13 +31,6 @@ export default function RootLayout({
               className="group min-w-0 justify-self-start rounded-2xl px-1 py-0.5 transition hover:bg-slate-100/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2"
             >
               <div className="flex items-center gap-2.5">
-                <span
-                  className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)]"
-                  aria-hidden
-                >
-                  <span className="absolute inset-x-2 top-2 h-1.5 rounded-full bg-white/70" />
-                  <span className="absolute bottom-2 left-1/2 h-4 w-1.5 -translate-x-1/2 rounded-full bg-white/80" />
-                </span>
                 <div className="min-w-0">
                   <div className="text-[15px] font-bold tracking-tight text-[var(--text)]">
                     StrokeChat
@@ -53,8 +46,8 @@ export default function RootLayout({
               aria-label="Main"
             >
               <NavLink href="/threads">Chat</NavLink>
-              <NavLink href="/biomedparse">CT Analysis</NavLink>
-              <NavLink href="/vessel-segmentation">Vessels</NavLink>
+              <NavLink href="/biomedparse">Stroke Segmentation</NavLink>
+              <NavLink href="/vessel-segmentation">Vessel Segmentation</NavLink>
             </nav>
             <div
               className="hidden justify-self-end rounded-full border border-[var(--border)] px-3 py-1 text-right text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)] md:block"
