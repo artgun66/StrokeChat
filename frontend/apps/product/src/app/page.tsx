@@ -192,8 +192,7 @@ export default async function Page() {
 
       {/* ── Disclaimer ─────────────────────────────────────────────────────── */}
       <p className="mt-8 text-xs leading-relaxed text-[var(--muted)]">
-        StrokeChat &mdash; research prototype by Artun Gunturkun, Henry M. Gunn High School, Palo Alto.
-        Not intended for clinical diagnosis or treatment. Always consult a qualified physician.
+        StrokeChat is not intended for clinical diagnosis or treatment. Always consult a qualified physician.
       </p>
 
     </main>
