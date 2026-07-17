@@ -11,9 +11,14 @@ export default function PublicationsPage() {
 
       <article className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
+          <a
+            href="https://mmfm-biomed.github.io/#accepted"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)] transition hover:border-[var(--accent)] hover:text-[var(--text)]"
+          >
             CVPR Workshop
-          </span>
+          </a>
           <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
             Poster
           </span>
@@ -82,8 +87,6 @@ export default function PublicationsPage() {
 
         <p className="mt-5 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
           Corresponding author: <a href="mailto:gunturkunartun@gmail.com" className="text-[var(--accent)] hover:underline">gunturkunartun@gmail.com</a>
-          <span className="mx-1.5">·</span>
-          Manuscript link coming soon.
         </p>
       </article>
 
