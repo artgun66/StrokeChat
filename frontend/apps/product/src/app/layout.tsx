@@ -50,6 +50,12 @@ export default function RootLayout({
               <NavLink href="/vessel-segmentation">Vessel Segmentation</NavLink>
             </nav>
             <div className="flex items-center justify-start gap-4 md:justify-self-end">
+              <Link
+                href="/publications"
+                className="inline-flex items-center text-xs font-medium text-[var(--muted)] transition hover:text-[var(--text)]"
+              >
+                Publications
+              </Link>
               <a
                 href="https://github.com/artgun66/StrokeChat"
                 target="_blank"

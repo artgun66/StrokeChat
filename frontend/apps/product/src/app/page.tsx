@@ -58,7 +58,10 @@ export default async function Page() {
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
             Validated stroke-imaging models are often locked behind machine-learning tooling. StrokeChat brings
-            them into one simple interface with MedGemma chat, BiomedParse lesion segmentation, and cerebrovascular
+            them into one simple interface with MedGemma chat, fine-tuned BiomedParse lesion segmentation
+            (developed by our team, see{" "}
+            <a href="/publications" className="font-medium text-[var(--accent)] hover:underline">Publications</a>),
+            and cerebrovascular
             vessel segmentation, so you can upload a CT or CTA scan, inspect overlays, and ask follow-up questions.
           </p>
           <p className="mt-6 text-sm leading-relaxed text-[var(--muted)]">
