@@ -42,17 +42,45 @@ export default async function Page() {
   return (
     <main className="mx-auto max-w-6xl px-5 py-10 md:px-10 md:py-16">
 
-      {/* ── Hero ───────────────────────────────────────────────────────────── */}
+      {/* ── Hero / Abstract ────────────────────────────────────────────────── */}
       <div className="mb-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-8 md:p-12">
         <div className="max-w-3xl">
-          <h1 className="text-4xl font-semibold tracking-tight text-[var(--text)] md:text-6xl">
-            Understand stroke findings with{" "}
-            <span className="bg-gradient-to-r from-[var(--accent-2)] to-[var(--accent)] bg-clip-text text-transparent">
-              guided AI analysis
-            </span>
+          <h1 className="text-4xl font-semibold tracking-tight text-[var(--text)] md:text-5xl">
+            StrokeChat
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
-            Ask clinical questions, analyse CT slices, and segment CTA vessels in a local-first research prototype designed for careful exploration.
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
+            Abstract
+          </p>
+          <p className="mt-4 text-base leading-relaxed text-[var(--muted)]">
+            A growing number of validated deep-learning models can detect, segment, and characterize
+            stroke-related findings on brain imaging. However, many of these models remain difficult for
+            clinicians to use because they are released as model weights or technical pipelines that require
+            machine-learning expertise to install, run, and interpret. This creates a translation gap:
+            stroke-imaging AI models are increasingly available in research, but physicians often cannot easily
+            use them in routine review. We introduce StrokeChat, a conversational platform that gives clinicians
+            access to multiple stroke-imaging AI workflows through a simple web and desktop interface. The system
+            currently supports three capabilities: conversation with MedGemma, stroke lesion detection and
+            segmentation using BiomedParse, and vessel segmentation using a cerebrovascular segmentation model.
+            A clinician can upload a non-contrast computed tomography (CT) image or CT angiography (CTA) scan,
+            view the corresponding model outputs, inspect segmentation overlays, review an ASPECTS estimate, and
+            ask follow-up questions through chat. StrokeChat is available as a web application for broad testing
+            and demonstration. For users or institutions that require local data control, the system can also be
+            downloaded and run on local hardware.
+          </p>
+          <p className="mt-6 text-sm leading-relaxed text-[var(--muted)]">
+            <span className="font-semibold text-[var(--text)]">Keywords:</span> stroke, conversational AI,
+            vision-language models, medical image segmentation, clinical decision support
+          </p>
+          <p className="mt-6 text-sm leading-relaxed text-[var(--muted)]">
+            StrokeChat is fully open source.{" "}
+            <a
+              href="https://github.com/artgun66/StrokeChat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[var(--accent)] hover:underline"
+            >
+              View the code on GitHub →
+            </a>
           </p>
         </div>
       </div>
