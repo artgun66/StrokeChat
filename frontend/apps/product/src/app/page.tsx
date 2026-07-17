@@ -54,26 +54,11 @@ export default async function Page() {
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
             Ask clinical questions, analyse CT slices, and segment CTA vessels in a local-first research prototype designed for careful exploration.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="/threads"
-              className="inline-flex items-center justify-center rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              Start a chat
-            </a>
-            <a
-              href="/biomedparse"
-              className="inline-flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-5 py-3 text-sm font-semibold text-[var(--text)] transition hover:border-[var(--accent)]"
-            >
-              Analyse CT scan
-            </a>
-          </div>
         </div>
       </div>
 
       {/* ── Combined card ──────────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6">
-        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">What you can do</p>
         <div className="grid gap-6 md:grid-cols-3">
           {CAPABILITIES.map((c) => (
             <a key={c.href} href={c.href} className="group rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 transition hover:border-[var(--accent)]">
