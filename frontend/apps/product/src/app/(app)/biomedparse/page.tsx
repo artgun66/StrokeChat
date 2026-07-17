@@ -60,6 +60,19 @@ const ASPECTS_REGIONS = [
 
 type RegionId = typeof ASPECTS_REGIONS[number]["id"];
 
+// Automated single-slice ASPECTS estimate returned by the model (see the Modal
+// endpoint). It is an ESTIMATE from lesion geometry, not a validated ASPECTS —
+// the UI pre-fills the region grid from it and lets the clinician adjust.
+type AspectsEstimate = {
+  estimate: boolean;
+  side: "left" | "right" | "bilateral";
+  distribution: string;
+  location: string;
+  regions: RegionId[];
+  score: number;
+  narrative: string;
+};
+
 // Validated use is binary: ASPECTS < 8 vs ≥ 8 (MDCalc / Barber 2000)
 // Higher scores = less ischemia = better prognosis
 function aspectsInterpretation(score: number) {
@@ -73,15 +86,19 @@ function aspectsInterpretation(score: number) {
 function AspectsScorer({
   confidence,
   maskAreaPct,
+  aspects,
 }: {
   confidence: number;
   maskAreaPct: number;
+  aspects?: AspectsEstimate | null;
 }) {
-  const [affected, setAffected] = useState<Set<RegionId>>(new Set());
-  // A score is shown ONLY after the clinician actively scores — by marking ≥1
-  // affected region, or explicitly recording a normal read (10). We never
-  // fabricate or default an ASPECTS value from the AI.
-  const [scored, setScored] = useState(false);
+  // When the model returns an automated estimate we pre-fill the region grid and
+  // score from it (no clicking required). It stays fully editable — the clinician
+  // can add/remove regions to correct the estimate.
+  const [affected, setAffected] = useState<Set<RegionId>>(
+    () => new Set(aspects?.regions ?? []),
+  );
+  const [scored, setScored] = useState<boolean>(() => !!aspects);
 
   const toggle = (id: RegionId) => {
     setScored(true);
@@ -92,9 +109,10 @@ function AspectsScorer({
     });
   };
 
+  // Reset restores the model's estimate (or clears it if there was none).
   const reset = () => {
-    setScored(false);
-    setAffected(new Set());
+    setAffected(new Set(aspects?.regions ?? []));
+    setScored(!!aspects);
   };
 
   // ASPECTS = 10 − number of regions the clinician marked as affected.
@@ -142,18 +160,31 @@ function AspectsScorer({
         )}
       </div>
 
+      {/* Automated estimate narrative — the model's read, editable below */}
+      {aspects && (
+        <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2.5">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+            Automated estimate — verify each region
+          </p>
+          <p className="text-xs leading-relaxed text-[var(--text)]/80">
+            {aspects.narrative}
+          </p>
+        </div>
+      )}
+
       {/* How the score was calculated — shown once scored */}
       {scored && (
         <p className="mb-3 text-xs leading-relaxed text-[var(--muted)]">
           {affected.size > 0 ? (
             <>
-              Calculated as{" "}
+              {aspects ? "Estimated" : "Calculated"} as{" "}
               <span className="font-semibold text-[var(--text)]">
                 10 − {affected.size} affected region{affected.size > 1 ? "s" : ""}
               </span>{" "}
               ({Array.from(affected).join(", ")}) ={" "}
               <span className="font-semibold text-[var(--text)]">{score}</span>. Each region
               with early ischemic change subtracts 1 point from a normal score of 10.
+              {aspects ? " Adjust the regions below to correct the estimate." : ""}
             </>
           ) : (
             <>
@@ -169,9 +200,9 @@ function AspectsScorer({
       {!scored && (
         <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2.5">
           <p className="text-xs leading-relaxed text-[var(--muted)]">
-            Not scored yet. ASPECTS is a clinician read — the AI segmentation is a visual aid
-            and does not compute it. Mark each region below that shows early ischemic change to
-            calculate the score.
+            No lesion was segmented on this slice, so there is nothing to estimate. Mark any
+            region below that shows early ischemic change to calculate the score, or record a
+            normal read.
           </p>
           <button
             onClick={() => setScored(true)}
@@ -296,6 +327,7 @@ type SliceResult = {
   prompt: string;
   overlay_image: string;
   original_image: string;
+  aspects?: AspectsEstimate | null;
   error?: string;
 };
 
@@ -343,6 +375,7 @@ function SliceCard({ result, index }: { result: SliceResult; index: number }) {
         <AspectsScorer
           confidence={result.confidence}
           maskAreaPct={result.mask_area_pct}
+          aspects={result.aspects}
         />
       )}
     </div>

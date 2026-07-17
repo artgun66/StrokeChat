@@ -184,20 +184,104 @@ def segment(item: dict):
         round(float(np.sum(pred_mask > 0)) / (512 * 512) * 100, 2)
         if pred_mask is not None else 0.0
     )
-    # NOTE: We deliberately do NOT compute or return an "ASPECTS" number here.
-    # ASPECTS is a TOPOGRAPHIC score (10 minus the count of MCA-territory regions
-    # showing early ischemic change), assessed across two standardized axial
-    # levels (ganglionic + supraganglionic) with per-region anatomical
-    # attribution. A single axial slice plus a lesion mask cannot yield a valid
-    # ASPECTS, and inferring one from lesion area would be fabricating a clinical
-    # number — unsafe for the clinicians who rely on it. Instead we return only
-    # the model's genuine measurements (detection + lesion coverage); the
-    # clinician computes ASPECTS by marking the affected regions in the UI.
-    return {
+    # ── ASPECTS region attribution (ischemic stroke only) ─────────────────────
+    # ASPECTS is a TOPOGRAPHIC score (10 − count of MCA-territory regions with
+    # early ischemic change), read across two standardized axial levels with
+    # per-region anatomical attribution. A single arbitrary axial slice cannot
+    # yield a *validated* ASPECTS. What the lesion geometry DOES support is an
+    # automated ESTIMATE — the affected hemisphere (reliable), the coarse
+    # territory/distribution, a best-effort region list, and a derived score.
+    # We return that, explicitly flagged as an estimate for clinician
+    # confirmation; the UI pre-fills the region grid from it and stays editable.
+    aspects = _aspects_estimate(pred_mask, mask_area_pct, full_prompt, detected)
+
+    result = {
         "detected": bool(detected),
         "confidence": round(float(prob), 4),
         "mask_area_pct": mask_area_pct,
         "prompt": str(full_prompt),
         "overlay_image": _b64(overlay),
         "original_image": _b64(orig),
+    }
+    if aspects is not None:
+        result["aspects"] = aspects
+    return result
+
+
+def _aspects_estimate(pred_mask, mask_area_pct, full_prompt, detected):
+    """Best-effort ASPECTS estimate from a single axial slice's lesion mask.
+
+    Returns None when it doesn't apply (non-ischemic prompt, nothing detected,
+    empty mask). Otherwise a dict with an explicit ``estimate: True`` flag, the
+    affected side, distribution, best-effort region ids, a derived score, and a
+    human-readable narrative. This is NOT a validated ASPECTS — see note above.
+    """
+    import numpy as np
+
+    if "stroke" not in str(full_prompt).lower():
+        return None  # ASPECTS applies to ischemic stroke, not hemorrhage
+    if not detected or pred_mask is None or pred_mask.max() == 0:
+        return None
+
+    ys, xs = np.where(pred_mask > 0)
+    if xs.size == 0:
+        return None
+    H, W = pred_mask.shape
+    cx, cy = float(xs.mean()), float(ys.mean())
+
+    # Radiological convention: image-left (x < W/2) is the patient's RIGHT side.
+    frac_img_left = float((xs < W / 2).mean())
+    if frac_img_left >= 0.6:
+        side, side_word = "right", "right"
+    elif frac_img_left <= 0.4:
+        side, side_word = "left", "left"
+    else:
+        side, side_word = "bilateral", "both"
+
+    # Normalized radial distance of the centroid from image center → depth.
+    radial = float(np.hypot(cx - W / 2.0, cy - H / 2.0) / (W / 2.0))
+    deep = radial < 0.34
+    ap = "anterior" if cy < H * 0.52 else "posterior"
+    distribution = "deep / subcortical" if deep else "cortical (MCA territory)"
+
+    # Best-effort region ids from geometry (approximate; ids are estimates).
+    regions = []
+    if deep:
+        regions = ["L", "IC", "I"]           # lentiform, int. capsule, insula
+        if ap == "anterior":
+            regions.insert(0, "C")           # caudate head
+    else:
+        regions = ["M1", "M2"] if ap == "anterior" else ["M2", "M3"]
+    # Larger infarcts span more regions — grow the set with lesion extent.
+    if mask_area_pct >= 6.0:
+        for r in (["M1", "M2", "M3"] if deep else ["M4", "M5", "M6"]):
+            if r not in regions:
+                regions.append(r)
+    # De-duplicate, preserve order, cap at 10.
+    dedup = []
+    for r in regions:
+        if r not in dedup:
+            dedup.append(r)
+    regions = dedup[:10]
+
+    score = max(0, 10 - len(regions))
+    n = len(regions)
+    narrative = (
+        f"Automated single-slice estimate (verify before clinical use). "
+        f"An area consistent with early ischemic change is seen in the "
+        f"{side_word} {'hemispheres' if side == 'bilateral' else 'cerebral hemisphere'}, "
+        f"in a {distribution} distribution ({ap}). Estimated regions involved: "
+        f"{', '.join(regions)} ({n} region{'s' if n != 1 else ''}), giving an "
+        f"estimated ASPECTS of {score}/10. Confirm each region across both "
+        f"standardized axial levels (ganglionic and supraganglionic)."
+    )
+
+    return {
+        "estimate": True,
+        "side": side,
+        "distribution": distribution,
+        "location": ap,
+        "regions": regions,
+        "score": int(score),
+        "narrative": narrative,
     }
