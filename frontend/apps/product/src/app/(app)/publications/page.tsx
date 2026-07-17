@@ -4,11 +4,6 @@ export default function PublicationsPage() {
       <h1 className="text-3xl font-semibold tracking-tight text-[var(--text)] md:text-4xl">
         Publications
       </h1>
-      <p className="mt-4 text-base leading-relaxed text-[var(--muted)]">
-        Research from our team behind StrokeChat, including the fine-tuned BiomedParse
-        model used for stroke lesion detection and segmentation.
-      </p>
-
       <article className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <a
