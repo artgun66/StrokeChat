@@ -58,8 +58,8 @@ export default async function Page() {
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted)] md:text-lg">
             Validated stroke-imaging models are often locked behind machine-learning tooling. StrokeChat brings
-            them into one simple interface — MedGemma chat, BiomedParse lesion segmentation, and cerebrovascular
-            vessel segmentation — so you can upload a CT or CTA scan, inspect overlays, and ask follow-up questions.
+            them into one simple interface with MedGemma chat, BiomedParse lesion segmentation, and cerebrovascular
+            vessel segmentation, so you can upload a CT or CTA scan, inspect overlays, and ask follow-up questions.
           </p>
           <p className="mt-6 text-sm leading-relaxed text-[var(--muted)]">
             StrokeChat is fully open source.{" "}
@@ -105,7 +105,7 @@ export default async function Page() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Run locally</p>
             <p className="mt-1 text-base font-semibold text-[var(--text)]">Download the desktop app</p>
             <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
-              Run StrokeChat fully offline — all inference on your own hardware, no account needed.
+              Run StrokeChat fully offline, with all inference on your own hardware and no account needed.
             </p>
           </div>
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border)]">
@@ -127,7 +127,7 @@ export default async function Page() {
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
             </svg>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-[var(--text)]">macOS — Apple Silicon</p>
+              <p className="text-sm font-semibold text-[var(--text)]">macOS · Apple Silicon</p>
               <p className="text-xs text-[var(--muted)]">M1 / M2 / M3 · .dmg</p>
             </div>
             <svg className="h-4 w-4 shrink-0 text-[var(--muted)] transition group-hover:translate-y-0.5 group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -145,7 +145,7 @@ export default async function Page() {
               <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
             </svg>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-[var(--text)]">macOS — Intel</p>
+              <p className="text-sm font-semibold text-[var(--text)]">macOS · Intel</p>
               <p className="text-xs text-[var(--muted)]">x86_64 · .dmg</p>
             </div>
             <svg className="h-4 w-4 shrink-0 text-[var(--muted)] transition group-hover:translate-y-0.5 group-hover:text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -175,7 +175,7 @@ export default async function Page() {
         <div className="mt-4 flex items-center gap-2">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
           <p className="text-xs text-[var(--muted)]">
-            First build in progress — downloads will be ready shortly.
+            First build in progress. Downloads will be ready shortly.
             <a href="https://github.com/artgun66/StrokeChat/releases" target="_blank" rel="noopener noreferrer"
               className="ml-1 text-[var(--accent)] hover:underline">
               Check GitHub Releases
