@@ -18,12 +18,13 @@ INSTALL_DIR="$(mktemp -d)/py"
 uv python install "$PYVER" --install-dir "$INSTALL_DIR"
 PYHOME="$(find "$INSTALL_DIR" -maxdepth 1 -type d -name "cpython-${PYVER}*" | head -1)"
 [[ -n "$PYHOME" ]] || { echo "  [$LABEL] could not locate installed cpython"; exit 1; }
-# Windows: binary is python.exe at root; Unix: bin/python3
-if [[ -f "$PYHOME/python.exe" ]]; then
-  PYBIN="$PYHOME/python.exe"
-else
-  PYBIN="$PYHOME/bin/python3"
-fi
+# Locate the interpreter without assuming a layout. uv's standalone CPython puts
+# the binary at bin/python3 on Unix, but on Windows it lands at python.exe — and
+# not always directly under $PYHOME (older layouts nest it under install/). Search
+# for it so the path is correct regardless of the platform's directory shape.
+PYBIN="$(find "$PYHOME" -maxdepth 3 \( -name python.exe -o -name python3 -o -name python3.exe \) -type f 2>/dev/null | head -1)"
+[[ -n "$PYBIN" ]] || { echo "  [$LABEL] could not locate the python interpreter under $PYHOME"; find "$PYHOME" -maxdepth 3 -name 'python*' >&2; exit 1; }
+echo "  [$LABEL] interpreter: $PYBIN"
 
 echo "  [$LABEL] installing deps into the runtime"
 # Use `uv pip install --python` to install into uv's own standalone interpreter.
@@ -49,7 +50,8 @@ fi
 echo "  [$LABEL] copying runtime -> $OUT"
 rm -rf "$OUT"
 cp -R "$PYHOME" "$OUT"
-# Sanity: the bundled interpreter must run standalone.
-OUT_BIN="$OUT/bin/python3"
-[[ -f "$OUT/python.exe" ]] && OUT_BIN="$OUT/python.exe"
+# Sanity: the bundled interpreter must run standalone. Locate it the same
+# layout-agnostic way as above (bin/python3 on Unix, python.exe on Windows).
+OUT_BIN="$(find "$OUT" -maxdepth 3 \( -name python.exe -o -name python3 -o -name python3.exe \) -type f 2>/dev/null | head -1)"
+[[ -n "$OUT_BIN" ]] || { echo "  [$LABEL] bundled interpreter missing under $OUT"; exit 1; }
 "$OUT_BIN" --version

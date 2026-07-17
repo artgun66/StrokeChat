@@ -25,6 +25,7 @@ jobs:
             platform: win-x64
 
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -54,19 +55,13 @@ jobs:
 
       - name: Build installer (Tauri)
         shell: bash
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.WINDOWS_CERTIFICATE }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
-          # Unset Apple signing vars when secrets aren't configured — an empty
-          # APPLE_CERTIFICATE causes Tauri to crash trying to import a blank cert.
-          [ -z "$APPLE_CERTIFICATE" ] && unset APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID || true
-          [ -z "$TAURI_SIGNING_PRIVATE_KEY" ] && unset TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD || true
+          # Unsigned builds. The configured signing secrets are currently invalid,
+          # and Tauri aborts (or hangs at an interactive keychain prompt) trying to
+          # import a bad certificate — which is what blocked every prior release.
+          # We deliberately do NOT export any APPLE_*/TAURI_SIGNING_* vars, so Tauri
+          # produces an unsigned .dmg / .exe. Re-introduce the signing env here once
+          # valid Apple + Windows certificates are stored as repo secrets.
           cd desktop && npm install && npm run build
 
       # Rename to fixed platform filenames (no version in name so /releases/latest/download/ links never break)
@@ -92,7 +87,10 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    # Run even if some platform builds failed, so the platforms that DID build still
+    # ship. `needs: build` normally requires every matrix job to succeed; always()
+    # overrides that. We still gate on tag/dispatch so unrelated pushes don't release.
+    if: ${{ always() && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch') }}
     permissions:
       contents: write
 
@@ -104,7 +102,7 @@ jobs:
           path: dist/
 
       - name: List built installers
-        run: ls -lh dist/
+        run: ls -lh dist/ || (echo "No installers were produced by any platform" && exit 1)
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
@@ -112,6 +110,11 @@ jobs:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
           name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Latest build' }}
           draft: false
-          prerelease: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+          # NOT a prerelease, and mark as the repo's latest release. GitHub's
+          # /releases/latest/download/ links (used by the home page) only ever
+          # resolve to a full, latest-marked release — a prerelease 404s. That flag
+          # being true is why the download buttons never worked.
+          prerelease: false
+          make_latest: true
           files: dist/*
           generate_release_notes: true
