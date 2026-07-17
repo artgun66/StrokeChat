@@ -79,9 +79,6 @@ export default function PublicationsPage() {
           </div>
         </div>
 
-        <p className="mt-5 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
-          Corresponding author: <a href="mailto:gunturkunartun@gmail.com" className="text-[var(--accent)] hover:underline">gunturkunartun@gmail.com</a>
-        </p>
       </article>
 
       <p className="mt-8 text-xs text-[var(--muted)]/60">
