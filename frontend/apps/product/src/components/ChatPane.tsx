@@ -4,7 +4,6 @@ import type { ThreadMessage } from "@local-llm/api-client";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { AvailableModel } from "../app/(app)/threads/view/ThreadView";
 import { api, apiBaseUrl } from "../lib/api";
-import { CustomInstructions } from "./CustomInstructions";
 import { MessageInput, type ImageAttachment, type NiftiAttachment, type MessageInputHandle } from "./MessageInput";
 
 type BiomedResult = {
@@ -109,8 +108,6 @@ export function ChatPane({
   modelSlug,
   availableModels,
   onModelChange,
-  systemPrompt,
-  onSystemPromptSave,
   onMessageComplete,
 }: Props) {
   const [messages, setMessages] = useState<DisplayMessage[]>(
@@ -381,7 +378,7 @@ export function ChatPane({
             )}
           </p>
           <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-            Drag in CT images for BiomedParse or .nii.gz CTA scans for vessel segmentation.
+            Drag in CT Slices for Stroke Segmentation or CTA Scans for Vessel Segmentation
           </p>
         </div>
         <div className="flex w-full flex-col gap-1 sm:w-auto sm:shrink-0 sm:items-end">
@@ -400,8 +397,6 @@ export function ChatPane({
           </select>
         </div>
       </header>
-
-      <CustomInstructions value={systemPrompt} onSave={onSystemPromptSave} />
 
       {/* ── Messages ───────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6">
