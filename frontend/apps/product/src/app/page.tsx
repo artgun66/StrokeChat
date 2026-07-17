@@ -175,18 +175,19 @@ export default async function Page() {
           </a>
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
-          <p className="text-xs text-[var(--muted)]">
-            First build in progress. Downloads will be ready shortly.
-            <a href="https://github.com/artgun66/StrokeChat/releases" target="_blank" rel="noopener noreferrer"
-              className="ml-1 text-[var(--accent)] hover:underline">
-              Check GitHub Releases
-            </a>
+        <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-elevated)] px-3 py-2.5">
+          <p className="text-xs font-medium text-[var(--text)]">First launch on macOS</p>
+          <p className="mt-1 text-xs leading-relaxed text-[var(--muted)]">
+            The app isn&rsquo;t notarized yet, so macOS may say it is &ldquo;damaged.&rdquo; It isn&rsquo;t —
+            that&rsquo;s Gatekeeper blocking an unsigned app. Move StrokeChat to Applications, then run{" "}
+            <code className="rounded bg-[var(--bg)] px-1 py-0.5 text-[11px] text-[var(--text)]">xattr -cr /Applications/StrokeChat.app</code>{" "}
+            in Terminal and open it normally.
           </p>
         </div>
         <p className="mt-2 text-xs text-[var(--muted)]">
-          GPU with ≥ 8 GB VRAM recommended · macOS 13+ or Windows 10+
+          GPU with ≥ 8 GB VRAM recommended · macOS 13+ or Windows 10+ ·{" "}
+          <a href="https://github.com/artgun66/StrokeChat/releases" target="_blank" rel="noopener noreferrer"
+            className="text-[var(--accent)] hover:underline">All releases</a>
         </p>
       </div>
 

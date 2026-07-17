@@ -35,7 +35,8 @@
       "../staged/": "staged/"
     },
     "macOS": {
-      "entitlements": "../build/entitlements.mac.plist"
+      "entitlements": "../build/entitlements.mac.plist",
+      "signingIdentity": "-"
     }
   }
 }
