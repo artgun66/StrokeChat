@@ -487,7 +487,7 @@ export default function BiomedParsePage() {
           <p className="text-xs text-[var(--muted)]/50">PNG, JPEG, DICOM · up to 12 images</p>
           <input
             ref={inputRef} type="file" accept="image/*,.dcm" multiple className="hidden"
-            onChange={(e) => { if (e.target.files?.length) addFiles(e.target.files); }}
+            onChange={(e) => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = ""; }}
           />
         </div>
 
@@ -595,7 +595,7 @@ export default function BiomedParsePage() {
 
       {results.length > 0 && (
         <button
-          onClick={() => { setResults([]); setFiles([]); setPreviews([]); }}
+          onClick={() => { setResults([]); setFiles([]); setPreviews([]); setError(null); if (inputRef.current) inputRef.current.value = ""; }}
           className="mt-5 rounded-lg border border-[var(--border)] px-3 py-2 text-xs text-[var(--muted)] transition hover:text-[var(--text)]"
         >
           Clear all & start over
