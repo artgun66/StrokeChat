@@ -62,7 +62,20 @@ jobs:
           # We deliberately do NOT export any APPLE_*/TAURI_SIGNING_* vars, so Tauri
           # produces an unsigned .dmg / .exe. Re-introduce the signing env here once
           # valid Apple + Windows certificates are stored as repo secrets.
-          cd desktop && npm install && npm run build
+          cd desktop && npm install
+          # Retry the bundle: the Windows NSIS bundler downloads its toolchain from
+          # GitHub during packaging and intermittently fails with `timeout: global`.
+          # Up to 3 attempts turns that transient network flake into a pass.
+          for attempt in 1 2 3; do
+            echo "==> tauri build attempt $attempt"
+            if npm run build; then
+              echo "==> build succeeded on attempt $attempt"; break
+            fi
+            if [ "$attempt" = "3" ]; then
+              echo "==> build failed after 3 attempts"; exit 1
+            fi
+            echo "==> attempt $attempt failed; retrying in 15s"; sleep 15
+          done
 
       # Rename to fixed platform filenames (no version in name so /releases/latest/download/ links never break)
       - name: Rename artifacts
