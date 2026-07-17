@@ -64,8 +64,7 @@ export default function PublicationsPage() {
         </div>
 
         <div className="mt-5 border-t border-[var(--border)] pt-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Key results</p>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { v: "95.2%", k: "Ischemic accuracy" },
               { v: "85.8%", k: "Ischemic F1" },
@@ -78,11 +77,6 @@ export default function PublicationsPage() {
               </div>
             ))}
           </div>
-          <ul className="mt-3 space-y-1.5 text-sm leading-relaxed text-[var(--muted)]">
-            <li>Substantially outperforms zero-shot GPT-5 and Gemini 2.5 Pro on CT stroke.</li>
-            <li>GPT-5 missed 97.3% of ischemic cases; Gemini 2.5 Pro showed poor specificity.</li>
-            <li>One model yields both classification and pixel-level segmentation for triage and delineation.</li>
-          </ul>
         </div>
 
         <p className="mt-5 border-t border-[var(--border)] pt-4 text-xs text-[var(--muted)]">
