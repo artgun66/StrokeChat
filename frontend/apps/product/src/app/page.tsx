@@ -178,8 +178,7 @@ export default async function Page() {
         <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-elevated)] px-3 py-2.5">
           <p className="text-xs font-medium text-[var(--text)]">First launch on macOS</p>
           <p className="mt-1 text-xs leading-relaxed text-[var(--muted)]">
-            The app isn&rsquo;t notarized yet, so macOS may say it is &ldquo;damaged.&rdquo; It isn&rsquo;t —
-            that&rsquo;s Gatekeeper blocking an unsigned app. Move StrokeChat to Applications, then run{" "}
+            Move StrokeChat to Applications, then run{" "}
             <code className="rounded bg-[var(--bg)] px-1 py-0.5 text-[11px] text-[var(--text)]">xattr -cr /Applications/StrokeChat.app</code>{" "}
             in Terminal and open it normally.
           </p>
