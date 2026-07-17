@@ -14,7 +14,9 @@ const CAPABILITIES = [
   {
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M19.8 15l-1.66 2.49m0 0L17 19m1.8-1.51L21 19m-3.2-1.51l-4.08-6.123M5 14.5L3 17m2-2.5l4.08-6.123" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v13" />
       </svg>
     ),
     title: "Analyse a CT scan",
@@ -26,7 +28,10 @@ const CAPABILITIES = [
   {
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75c2.25-4.5 5.25-6.75 9-6.75 2.25 0 4.125.75 5.625 2.25M19.5 11.25c-2.25 4.5-5.25 6.75-9 6.75-2.25 0-4.125-.75-5.625-2.25M8.25 9.75c1.5 0 2.25 1.5 3.75 1.5s2.25-1.5 3.75-1.5M8.25 14.25c1.5 0 2.25-1.5 3.75-1.5s2.25 1.5 3.75 1.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 22V13m0 0 4.2-4.2M12 13 7.8 8.8M12 13V7.2" />
+        <circle cx="12" cy="4.8" r="2.2" />
+        <circle cx="18" cy="7" r="2.2" />
+        <circle cx="6" cy="7" r="2.2" />
       </svg>
     ),
     title: "Segment vessels",
