@@ -190,10 +190,6 @@ export default async function Page() {
         </p>
       </div>
 
-      {/* ── Disclaimer ─────────────────────────────────────────────────────── */}
-      <p className="mt-8 text-xs leading-relaxed text-[var(--muted)]">
-        StrokeChat is not intended for clinical diagnosis or treatment. Always consult a qualified physician.
-      </p>
 
     </main>
   );

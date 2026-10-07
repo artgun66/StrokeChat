@@ -635,9 +635,6 @@ export default function BiomedParsePage() {
         </button>
       )}
 
-      <p className="mt-8 text-xs text-[var(--muted)]/50">
-        StrokeChat · research prototype · not for clinical diagnosis or treatment.
-      </p>
     </main>
   );
 }

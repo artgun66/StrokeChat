@@ -492,7 +492,7 @@ export function ChatPane({
                             </div>
                           </div>
                           <p className="mt-2 text-xs italic text-[var(--muted)]/70">
-                            BiomedParse fine-tuned model · not for clinical use
+                            BiomedParse fine-tuned model
                           </p>
                         </div>
                       ))}
@@ -528,7 +528,7 @@ export function ChatPane({
                             </div>
                           </div>
                           <p className="mt-2 text-xs italic text-[var(--muted)]/70">
-                            nnUNet robust-vessel-segmentation · not for clinical use
+                            nnUNet robust-vessel-segmentation
                           </p>
                         </div>
                       ))}

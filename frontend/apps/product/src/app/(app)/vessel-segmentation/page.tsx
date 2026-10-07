@@ -227,7 +227,7 @@ export default function VesselSegmentationPage() {
       </div>
 
       <p className="mt-6 text-xs text-[var(--muted)]">
-        StrokeChat · alceballosa/robust-vessel-segmentation · CC-BY-NC-SA 4.0 · not for clinical use.
+        StrokeChat · alceballosa/robust-vessel-segmentation · CC-BY-NC-SA 4.0
       </p>
 
     </main>
