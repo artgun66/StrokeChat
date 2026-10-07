@@ -89,9 +89,6 @@ export default function VesselSegmentationPage() {
             nnUNet · robust-vessel-segmentation · 3D CTA → binary vessel mask
           </p>
         </div>
-        <span className="rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
-          Research only
-        </span>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

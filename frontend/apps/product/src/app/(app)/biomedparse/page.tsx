@@ -489,9 +489,6 @@ export default function BiomedParsePage() {
             BiomedParse segmentation · interactive ASPECTS scoring · up to 12 slices
           </p>
         </div>
-        <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
-          Research only
-        </span>
       </div>
 
       {/* Controls row */}

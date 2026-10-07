@@ -13,7 +13,7 @@ const fontSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "StrokeChat — AI-powered stroke analysis",
   description:
-    "Ask questions about stroke and analyse CT scans with AI-powered segmentation. Research tool for stroke education and detection.",
+    "Ask questions about stroke and analyse CT scans with AI-powered segmentation.",
 };
 
 export default function RootLayout({
