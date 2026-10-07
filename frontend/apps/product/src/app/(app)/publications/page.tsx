@@ -6,6 +6,87 @@ export default function PublicationsPage() {
       </h1>
       <article className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
+            NeurIPS 2026
+          </span>
+          <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
+            Demonstration
+          </span>
+        </div>
+
+        <h2 className="mt-4 text-xl font-semibold leading-snug tracking-tight text-[var(--text)]">
+          StrokeChat: A Locally Deployable Conversational Interface for
+          Stroke-Imaging AI Models
+        </h2>
+
+        <p className="mt-3 text-sm leading-relaxed text-[var(--text)]">
+          Artun Gunturkun<sup>1</sup>, Halil Ibrahim Gulluk, PhD<sup>2</sup>,
+          Ilker Ozgur Koska, MD, PhD<sup>3</sup>, Olivier Gevaert<sup>4</sup>
+        </p>
+        <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
+          <sup>1</sup> Henry M. Gunn High School · <sup>2</sup> Electrical Engineering, Stanford University ·{" "}
+          <sup>3</sup> Department of Radiology, Acibadem Healthcare ·{" "}
+          <sup>4</sup> Computational Medicine, Stanford University
+        </p>
+
+        <div className="mt-5 border-t border-[var(--border)] pt-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">Abstract</p>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+            A growing number of AI models can detect, segment, and characterize stroke-related
+            findings on brain imaging. However, many remain difficult for clinicians to access
+            because they are distributed as model weights, code repositories, and technical
+            pipelines. This access gap may be particularly important in smaller hospitals and
+            resource-limited settings where immediate neuroradiology expertise is not continuously
+            available. We developed <em>StrokeChat</em>, a clinician-facing platform that integrates
+            stroke lesion detection and segmentation, ASPECTS estimation, cerebrovascular
+            segmentation, and medical vision-language conversation within a single interface.
+            StrokeChat is designed to run fully locally, as a downloadable application that can be
+            installed on institutional hardware so that patient imaging never leaves the site; a web
+            version is also available for convenient testing and demonstration. The source code,
+            implementation details, and installation instructions are available at{" "}
+            <a
+              href="https://github.com/artgun66/StrokeChat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent)] hover:underline"
+            >
+              github.com/artgun66/StrokeChat
+            </a>
+            , and a live demonstration of the web version at{" "}
+            <a
+              href="https://strokechat.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent)] hover:underline"
+            >
+              strokechat.vercel.app
+            </a>
+            . StrokeChat illustrates a practical, locally deployable approach for translating
+            specialized stroke-imaging AI models into an accessible, conversational decision-support
+            environment that keeps imaging data on-site.
+          </p>
+        </div>
+
+        <div className="mt-5 border-t border-[var(--border)] pt-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { v: "CT", k: "Stroke lesion detection & segmentation" },
+              { v: "ASPECTS", k: "Derived from the on-screen segmentation" },
+              { v: "CTA", k: "Cerebrovascular segmentation" },
+              { v: "Chat", k: "MedGemma 4B, grounded in model outputs" },
+            ].map((m) => (
+              <div key={m.k} className="rounded-xl border border-[var(--border)] bg-[var(--panel-elevated)] p-3">
+                <p className="text-lg font-semibold text-[var(--text)]">{m.v}</p>
+                <p className="mt-0.5 text-xs leading-tight text-[var(--muted)]">{m.k}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </article>
+
+      <article className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
+        <div className="flex flex-wrap items-center gap-2">
           <a
             href="https://mmfm-biomed.github.io/#accepted"
             target="_blank"
@@ -76,9 +157,6 @@ export default function PublicationsPage() {
 
       </article>
 
-      <p className="mt-8 text-xs text-[var(--muted)]/60">
-        StrokeChat · research prototype · not for clinical diagnosis or treatment.
-      </p>
     </main>
   );
 }
