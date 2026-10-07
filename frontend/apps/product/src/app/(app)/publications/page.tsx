@@ -6,21 +6,19 @@ export default function PublicationsPage() {
       </h1>
       <article className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
-            NeurIPS 2026
-          </span>
-        </div>
-
-        <h2 className="mt-4 text-xl font-semibold leading-snug tracking-tight text-[var(--text)]">
           <a
             href="https://openreview.net/group?id=NeurIPS.cc/2026/Workshop/GenAI4Health_Demonstration_Paper_Track#tab-accept-poster"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition hover:text-[var(--accent)] hover:underline"
+            className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)] transition hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
-            StrokeChat: A Locally Deployable Conversational Interface for
-            Stroke-Imaging AI Models
+            NeurIPS 2026
           </a>
+        </div>
+
+        <h2 className="mt-4 text-xl font-semibold leading-snug tracking-tight text-[var(--text)]">
+          StrokeChat: A Locally Deployable Conversational Interface for
+          Stroke-Imaging AI Models
         </h2>
 
         <p className="mt-3 text-sm leading-relaxed text-[var(--text)]">
