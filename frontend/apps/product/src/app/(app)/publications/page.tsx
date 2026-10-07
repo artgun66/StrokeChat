@@ -12,9 +12,6 @@ export default function PublicationsPage() {
           <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
             GenAI4Health
           </span>
-          <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
-            Demonstration Paper · Poster
-          </span>
         </div>
 
         <h2 className="mt-4 text-xl font-semibold leading-snug tracking-tight text-[var(--text)]">
@@ -65,7 +62,6 @@ export default function PublicationsPage() {
               clinical decision support
             </span>
           </p>
-          <p className="mt-2 text-xs text-[var(--muted)]/70">CC BY 4.0</p>
         </div>
 
       </article>
