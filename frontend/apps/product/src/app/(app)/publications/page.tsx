@@ -26,7 +26,8 @@ export default function PublicationsPage() {
           Özgür Ilker Koska<sup>3</sup>, Olivier Gevaert<sup>1</sup>
         </p>
         <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
-          <sup>1</sup> Stanford University · <sup>2</sup> University of Mississippi Medical Center ·{" "}
+          <sup>1</sup> Stanford University ·{" "}
+          <sup>2</sup> Department of Neurology, Krankenhaus Nordwest ·{" "}
           <sup>3</sup> Afyon Kocatepe University
         </p>
         <p className="mt-1 text-xs text-[var(--muted)]">
