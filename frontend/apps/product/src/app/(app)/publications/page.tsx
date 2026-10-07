@@ -32,7 +32,7 @@ export default function PublicationsPage() {
           <sup>5</sup> Computational Medicine, Stanford University
         </p>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Demonstration Paper Track at NeurIPS 2026. Published 05 Oct 2026.
+          Published 05 Oct 2026.
         </p>
 
         <div className="mt-5 border-t border-[var(--border)] pt-5">
