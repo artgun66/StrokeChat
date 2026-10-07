@@ -22,13 +22,14 @@ export default function PublicationsPage() {
         </h2>
 
         <p className="mt-3 text-sm leading-relaxed text-[var(--text)]">
-          Artun Gunturkun, Halil Ibrahim Gulluk<sup>1</sup>, Burc Bassa<sup>2</sup>,{" "}
-          Özgür Ilker Koska<sup>3</sup>, Olivier Gevaert<sup>1</sup>
+          Artun Gunturkun<sup>1</sup>, Halil Ibrahim Gulluk<sup>2</sup>, Burc Bassa<sup>3</sup>,{" "}
+          Özgür Ilker Koska<sup>4</sup>, Olivier Gevaert<sup>5</sup>
         </p>
         <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
-          <sup>1</sup> Stanford University ·{" "}
-          <sup>2</sup> Department of Neurology, Krankenhaus Nordwest ·{" "}
-          <sup>3</sup> Afyon Kocatepe University
+          <sup>1</sup> Henry M. Gunn High School · <sup>2</sup> Electrical Engineering, Stanford University ·{" "}
+          <sup>3</sup> Department of Neurology, Krankenhaus Nordwest ·{" "}
+          <sup>4</sup> Department of Radiology, Acibadem Healthcare ·{" "}
+          <sup>5</sup> Computational Medicine, Stanford University
         </p>
         <p className="mt-1 text-xs text-[var(--muted)]">
           Demonstration Paper Track at NeurIPS 2026. Published 05 Oct 2026.
