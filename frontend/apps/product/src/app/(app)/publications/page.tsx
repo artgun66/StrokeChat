@@ -7,10 +7,13 @@ export default function PublicationsPage() {
       <article className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
-            NeurIPS 2026
+            NeurIPS 2026 Workshop
           </span>
           <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
-            Demonstration
+            GenAI4Health
+          </span>
+          <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
+            Demonstration Paper · Poster
           </span>
         </div>
 
@@ -20,13 +23,16 @@ export default function PublicationsPage() {
         </h2>
 
         <p className="mt-3 text-sm leading-relaxed text-[var(--text)]">
-          Artun Gunturkun<sup>1</sup>, Halil Ibrahim Gulluk, PhD<sup>2</sup>,
-          Ilker Ozgur Koska, MD, PhD<sup>3</sup>, Olivier Gevaert<sup>4</sup>
+          Artun Gunturkun, Halil Ibrahim Gulluk<sup>1</sup>, Burc Bassa<sup>2</sup>,{" "}
+          Özgür Ilker Koska<sup>3</sup>, Olivier Gevaert<sup>1</sup>
         </p>
         <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
-          <sup>1</sup> Henry M. Gunn High School · <sup>2</sup> Electrical Engineering, Stanford University ·{" "}
-          <sup>3</sup> Department of Radiology, Acibadem Healthcare ·{" "}
-          <sup>4</sup> Computational Medicine, Stanford University
+          <sup>1</sup> Stanford University · <sup>2</sup> University of Mississippi Medical Center ·{" "}
+          <sup>3</sup> Afyon Kocatepe University
+        </p>
+        <p className="mt-1 text-xs text-[var(--muted)]">
+          Demonstration Paper Track poster at the NeurIPS 2026 Workshop on GenAI4Health.
+          Published 05 Oct 2026.
         </p>
 
         <div className="mt-5 border-t border-[var(--border)] pt-5">
@@ -42,45 +48,24 @@ export default function PublicationsPage() {
             segmentation, and medical vision-language conversation within a single interface.
             StrokeChat is designed to run fully locally, as a downloadable application that can be
             installed on institutional hardware so that patient imaging never leaves the site; a web
-            version is also available for convenient testing and demonstration. The source code,
-            implementation details, and installation instructions are available at{" "}
-            <a
-              href="https://github.com/artgun66/StrokeChat"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent)] hover:underline"
-            >
-              github.com/artgun66/StrokeChat
-            </a>
-            , and a live demonstration of the web version at{" "}
-            <a
-              href="https://strokechat.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent)] hover:underline"
-            >
-              strokechat.vercel.app
-            </a>
-            . StrokeChat illustrates a practical, locally deployable approach for translating
+            version is also available for convenient testing and demonstration. In a prospective
+            evaluation, ten physicians (five neurologists and five radiologists) independently
+            reviewed five de-identified CT/CTA cases each, yielding 50 case-level evaluations.
+            StrokeChat illustrates a practical, locally deployable approach for translating
             specialized stroke-imaging AI models into an accessible, conversational decision-support
             environment that keeps imaging data on-site.
           </p>
         </div>
 
         <div className="mt-5 border-t border-[var(--border)] pt-5">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
-              { v: "CT", k: "Stroke lesion detection & segmentation" },
-              { v: "ASPECTS", k: "Derived from the on-screen segmentation" },
-              { v: "CTA", k: "Cerebrovascular segmentation" },
-              { v: "Chat", k: "MedGemma 4B, grounded in model outputs" },
-            ].map((m) => (
-              <div key={m.k} className="rounded-xl border border-[var(--border)] bg-[var(--panel-elevated)] p-3">
-                <p className="text-lg font-semibold text-[var(--text)]">{m.v}</p>
-                <p className="mt-0.5 text-xs leading-tight text-[var(--muted)]">{m.k}</p>
-              </div>
-            ))}
-          </div>
+          <p className="text-xs leading-relaxed text-[var(--muted)]">
+            <span className="font-semibold uppercase tracking-[0.2em]">Keywords</span>{" "}
+            <span className="ml-1">
+              stroke · conversational AI · vision-language models · medical image segmentation ·
+              clinical decision support
+            </span>
+          </p>
+          <p className="mt-2 text-xs text-[var(--muted)]/70">CC BY 4.0</p>
         </div>
 
       </article>
