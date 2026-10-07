@@ -7,13 +7,20 @@ export default function PublicationsPage() {
       <article className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-6 md:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
-            NeurIPS 2026 Workshop
+            NeurIPS 2026
           </span>
         </div>
 
         <h2 className="mt-4 text-xl font-semibold leading-snug tracking-tight text-[var(--text)]">
-          StrokeChat: A Locally Deployable Conversational Interface for
-          Stroke-Imaging AI Models
+          <a
+            href="https://openreview.net/group?id=NeurIPS.cc/2026/Workshop/GenAI4Health_Demonstration_Paper_Track#tab-accept-poster"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition hover:text-[var(--accent)] hover:underline"
+          >
+            StrokeChat: A Locally Deployable Conversational Interface for
+            Stroke-Imaging AI Models
+          </a>
         </h2>
 
         <p className="mt-3 text-sm leading-relaxed text-[var(--text)]">
@@ -25,7 +32,7 @@ export default function PublicationsPage() {
           <sup>3</sup> Afyon Kocatepe University
         </p>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Demonstration Paper Track at the NeurIPS 2026 Workshop. Published 05 Oct 2026.
+          Demonstration Paper Track at NeurIPS 2026. Published 05 Oct 2026.
         </p>
 
         <div className="mt-5 border-t border-[var(--border)] pt-5">
@@ -70,7 +77,7 @@ export default function PublicationsPage() {
             rel="noopener noreferrer"
             className="rounded-full border border-[var(--border)] bg-[var(--panel-elevated)] px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--muted)] transition hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
-            CVPR 2026 Workshop
+            CVPR 2026
           </a>
         </div>
 
@@ -89,7 +96,7 @@ export default function PublicationsPage() {
           <sup>4</sup> Computational Medicine, Stanford University
         </p>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Presented at a CVPR 2026 Workshop.
+          Presented at CVPR 2026.
         </p>
 
         <div className="mt-5 border-t border-[var(--border)] pt-5">
